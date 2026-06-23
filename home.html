@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Alexis Huerta</title>
+  <style>
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+    :root {
+      --bg:        #080d1a;
+      --card:      #0f1629;
+      --border:    #1a2840;
+      --blue:      #2563eb;
+      --teal:      #06b6d4;
+      --txt:       #f1f5f9;
+      --txt2:      #94a3b8;
+      --txt3:      #475569;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: var(--bg);
+      color: var(--txt);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 32px 20px;
+    }
+
+    .hero {
+      max-width: 640px;
+      width: 100%;
+      text-align: center;
+    }
+
+    .photo-wrap {
+      width: 168px;
+      height: 168px;
+      border-radius: 50%;
+      margin: 0 auto 28px;
+      overflow: hidden;
+      border: 3px solid var(--border);
+      background: linear-gradient(135deg, #2563eb, #06b6d4);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 8px 32px rgba(37,99,235,.25);
+    }
+    .photo-wrap img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: none; /* shown via JS once the image successfully loads */
+    }
+    .photo-fallback {
+      font-size: 56px;
+      font-weight: 700;
+      color: #fff;
+      letter-spacing: 1px;
+    }
+
+    h1 {
+      font-size: 30px;
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+
+    .tagline {
+      font-size: 15px;
+      color: var(--teal);
+      font-weight: 600;
+      margin-bottom: 18px;
+    }
+
+    .bio {
+      font-size: 14.5px;
+      color: var(--txt2);
+      line-height: 1.7;
+      max-width: 520px;
+      margin: 0 auto 32px;
+    }
+
+    .btn-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      justify-content: center;
+      margin-bottom: 28px;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 13px 24px;
+      border-radius: 10px;
+      font-size: 14px;
+      font-weight: 600;
+      text-decoration: none;
+      border: 1px solid var(--border);
+      transition: all .15s;
+      cursor: pointer;
+    }
+    .btn-primary {
+      background: linear-gradient(135deg, #2563eb, #06b6d4);
+      color: #fff;
+      border: none;
+    }
+    .btn-primary:hover { filter: brightness(1.1); transform: translateY(-1px); }
+    .btn-secondary {
+      background: rgba(255,255,255,.04);
+      color: var(--txt);
+    }
+    .btn-secondary:hover { background: rgba(255,255,255,.08); transform: translateY(-1px); }
+
+    .contact {
+      font-size: 12.5px;
+      color: var(--txt3);
+    }
+    .contact a { color: var(--txt3); text-decoration: none; }
+    .contact a:hover { color: var(--teal); }
+  </style>
+</head>
+<body>
+
+  <div class="hero">
+    <div class="photo-wrap">
+      <img id="profilePhoto" src="assets/photo.jpg" alt="Alexis Huerta" onload="this.style.display='block'; document.getElementById('photoFallback').style.display='none';" onerror="this.style.display='none';">
+      <div class="photo-fallback" id="photoFallback">AH</div>
+    </div>
+
+    <h1>Alexis Huerta</h1>
+    <div class="tagline">Economics & Latin American Studies · Colby College</div>
+
+    <p class="bio">
+      Asset Management &amp; Wealth Management Intern at Sapere Aude Consortium, researching alternative asset classes
+      and liquidity solutions. Previously on BlackRock's Thematic Team, building ETF allocations and benchmarking
+      strategies for client portfolios. QuestBridge Scholar and President of First Generation Investors at Colby College.
+    </p>
+
+    <div class="btn-row">
+      <a class="btn btn-primary" href="index.html">📊 View My Portfolio</a>
+      <a class="btn btn-secondary" href="assets/resume.pdf" target="_blank" rel="noopener">📄 View My Resume</a>
+      <a class="btn btn-secondary" href="https://www.linkedin.com/in/ah110806" target="_blank" rel="noopener">💼 LinkedIn</a>
+    </div>
+
+    <div class="contact">
+      Queens, NY &middot; <a href="mailto:ahuert28@colby.edu">ahuert28@colby.edu</a>
+    </div>
+  </div>
+
+</body>
+</html>
