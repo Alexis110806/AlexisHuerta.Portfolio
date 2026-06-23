@@ -1,0 +1,1798 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Alexis — Investment Portfolio</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <style>
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+    :root {
+      --bg:        #080d1a;
+      --card:      #0f1629;
+      --card-hov:  #141e35;
+      --border:    #1a2840;
+      --blue:      #2563eb;
+      --teal:      #06b6d4;
+      --green:     #10b981;
+      --red:       #ef4444;
+      --yellow:    #f59e0b;
+      --purple:    #8b5cf6;
+      --slate:     #64748b;
+      --txt:       #f1f5f9;
+      --txt2:      #94a3b8;
+      --txt3:      #475569;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: var(--bg);
+      color: var(--txt);
+      min-height: 100vh;
+    }
+
+    /* ── HEADER ── */
+    .header {
+      background: var(--card);
+      border-bottom: 1px solid var(--border);
+      padding: 14px 32px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+    .logo { display: flex; align-items: center; gap: 12px; }
+    .logo-icon {
+      width: 38px; height: 38px;
+      background: linear-gradient(135deg, #2563eb, #06b6d4);
+      border-radius: 9px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 20px;
+    }
+    .logo h1 { font-size: 17px; font-weight: 700; letter-spacing: -0.3px; }
+    .logo p  { font-size: 11px; color: var(--txt3); margin-top: 1px; }
+
+    .header-right { display: flex; align-items: center; gap: 14px; }
+    #lastUpdated  { font-size: 12px; color: var(--txt3); }
+
+    .btn {
+      padding: 8px 16px;
+      border-radius: 7px;
+      border: none;
+      font-size: 13px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: background 0.15s;
+    }
+    .btn-primary { background: var(--blue); color: #fff; }
+    .btn-primary:hover { background: #1d4ed8; }
+    .btn-primary:disabled { background: var(--txt3); cursor: not-allowed; }
+
+    /* ── LAYOUT ── */
+    .wrap { max-width: 1600px; margin: 0 auto; padding: 24px 32px; }
+
+    /* ── ACCOUNT TABS ── */
+    .tabs { display: flex; gap: 8px; margin-bottom: 22px; flex-wrap: wrap; }
+    .tab {
+      padding: 9px 18px;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      background: var(--card);
+      color: var(--txt2);
+      font-size: 13px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+    .tab:hover { border-color: var(--blue); color: var(--txt); }
+    .tab.active { background: var(--blue); border-color: var(--blue); color: #fff; }
+    .tab sup {
+      font-size: 10px;
+      background: rgba(255,255,255,0.18);
+      padding: 1px 5px;
+      border-radius: 8px;
+      margin-left: 5px;
+    }
+
+    /* ── METRIC CARDS ── */
+    .metrics { display: grid; grid-template-columns: repeat(4,1fr); gap: 14px; margin-bottom: 22px; }
+    .mcard {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 18px 20px;
+    }
+    .mlabel { font-size: 11px; color: var(--txt3); text-transform: uppercase; letter-spacing: .6px; margin-bottom: 8px; }
+    .mval   { font-size: 26px; font-weight: 700; letter-spacing: -.5px; }
+    .msub   { font-size: 12px; margin-top: 4px; color: var(--txt3); }
+
+    .pos { color: var(--green); }
+    .neg { color: var(--red); }
+
+    /* ── MAIN GRID ── */
+    .main-grid {
+      display: grid;
+      grid-template-columns: 1fr 360px;
+      gap: 18px;
+      margin-bottom: 18px;
+    }
+
+    /* ── CARD ── */
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      overflow: hidden;
+    }
+    .card-head {
+      padding: 14px 18px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .card-title { font-size: 13px; font-weight: 600; }
+    .card-sub   { font-size: 11px; color: var(--txt3); margin-top: 2px; }
+
+    /* ── TABLE ── */
+    table  { width: 100%; border-collapse: collapse; }
+    th {
+      padding: 9px 14px;
+      font-size: 10px;
+      font-weight: 600;
+      color: var(--txt3);
+      text-transform: uppercase;
+      letter-spacing: .5px;
+      border-bottom: 1px solid var(--border);
+      text-align: left;
+    }
+    td { padding: 12px 14px; font-size: 12.5px; border-bottom: 1px solid rgba(255,255,255,.03); }
+    tr:last-child td { border-bottom: none; }
+    tr:hover td { background: var(--card-hov); }
+
+    .sym {
+      display: inline-block;
+      background: rgba(6,182,212,.12);
+      color: var(--teal);
+      padding: 2px 7px;
+      border-radius: 4px;
+      font-size: 11.5px;
+      font-weight: 700;
+      font-family: 'SF Mono', monospace;
+    }
+    .hname { font-size: 11px; color: var(--txt3); margin-top: 2px; }
+
+    .stag {
+      display: inline-block;
+      padding: 2px 7px;
+      border-radius: 4px;
+      font-size: 10.5px;
+      font-weight: 500;
+    }
+    .acct-pill {
+      font-size: 9.5px;
+      padding: 1px 5px;
+      border-radius: 4px;
+      background: rgba(255,255,255,.07);
+      color: var(--txt3);
+      margin-left: 5px;
+    }
+
+    /* ── RIGHT COL ── */
+    .right-col { display: flex; flex-direction: column; gap: 16px; }
+    .chart-wrap { position: relative; height: 210px; padding: 14px; }
+
+    /* ── BOTTOM GRID ── */
+    .bottom-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
+
+    /* ── BENCHMARKS ── */
+    .bm-row {
+      padding: 11px 16px;
+      border-bottom: 1px solid rgba(255,255,255,.03);
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .bm-row:last-child { border-bottom: none; }
+    .bm-sym { font-size: 12px; font-weight: 700; color: var(--teal); font-family: monospace; width: 52px; flex-shrink: 0; }
+    .bm-label { font-size: 10px; color: var(--txt3); margin-top: 1px; }
+    .bm-bar-bg { flex: 1; height: 5px; background: rgba(255,255,255,.06); border-radius: 3px; overflow: hidden; }
+    .bm-bar    { height: 100%; border-radius: 3px; transition: width .4s ease; }
+    .bm-pct { font-size: 12px; font-weight: 600; width: 52px; text-align: right; flex-shrink: 0; }
+    .bm-vs  { font-size: 10px; color: var(--txt3); text-align: right; }
+
+    /* ── RECOMMENDATIONS ── */
+    .rec {
+      padding: 13px 16px;
+      border-bottom: 1px solid rgba(255,255,255,.03);
+    }
+    .rec:last-child { border-bottom: none; }
+    .rec-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 3px; }
+    .rec-sector { font-size: 12.5px; font-weight: 600; }
+    .rec-badge  { font-size: 10px; padding: 2px 7px; border-radius: 4px; background: rgba(16,185,129,.14); color: var(--green); }
+    .rec-tickers { font-size: 11.5px; color: var(--teal); font-family: monospace; margin-bottom: 3px; }
+    .rec-note    { font-size: 11px; color: var(--txt3); line-height: 1.45; }
+
+    /* ── SPINNER ── */
+    .spin {
+      display: inline-block; width: 13px; height: 13px;
+      border: 2px solid rgba(255,255,255,.2);
+      border-top-color: #fff;
+      border-radius: 50%;
+      animation: sp .7s linear infinite;
+      margin-right: 6px; vertical-align: middle;
+    }
+    @keyframes sp { to { transform: rotate(360deg); } }
+
+    /* ── API WARNING ── */
+    .api-warn {
+      background: rgba(245,158,11,.08);
+      border: 1px solid rgba(245,158,11,.25);
+      border-radius: 8px;
+      padding: 10px 14px;
+      font-size: 12px;
+      color: var(--yellow);
+      margin-bottom: 18px;
+      display: none;
+    }
+
+    /* ── FOOTER ── */
+    .footer {
+      margin-top: 30px;
+      padding: 14px 0;
+      border-top: 1px solid var(--border);
+      text-align: center;
+      font-size: 11px;
+      color: var(--txt3);
+      line-height: 1.7;
+    }
+
+    @media (max-width: 1100px) {
+      .main-grid   { grid-template-columns: 1fr; }
+      .bottom-grid { grid-template-columns: 1fr; }
+      .metrics     { grid-template-columns: repeat(2,1fr); }
+    }
+
+    /* ── AUDIT BUTTON ── */
+    .btn-audit {
+      padding: 9px 18px;
+      border-radius: 8px;
+      border: 1px solid rgba(245,158,11,.4);
+      background: rgba(245,158,11,.08);
+      color: var(--yellow);
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all .15s;
+      margin-left: 8px;
+    }
+    .btn-audit:hover { background: rgba(245,158,11,.18); border-color: var(--yellow); }
+
+    /* ── AUDIT OVERLAY ── */
+    .audit-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(4,7,17,.88);
+      z-index: 200;
+      overflow-y: auto;
+      padding: 32px;
+    }
+    .audit-overlay.open { display: block; }
+
+    .audit-modal {
+      max-width: 1100px;
+      margin: 0 auto;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      overflow: hidden;
+    }
+
+    .audit-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 20px 28px;
+      border-bottom: 1px solid var(--border);
+      background: rgba(245,158,11,.06);
+    }
+    .audit-header h2 { font-size: 18px; font-weight: 700; color: var(--yellow); }
+    .audit-header p  { font-size: 12px; color: var(--txt3); margin-top: 3px; }
+
+    .audit-close {
+      background: rgba(255,255,255,.06);
+      border: 1px solid var(--border);
+      color: var(--txt2);
+      width: 34px; height: 34px;
+      border-radius: 8px;
+      font-size: 18px;
+      cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      transition: all .15s;
+    }
+    .audit-close:hover { background: rgba(255,255,255,.12); color: var(--txt); }
+
+    .audit-body { padding: 28px; display: flex; flex-direction: column; gap: 28px; }
+
+    .audit-section-title {
+      font-size: 13px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: .7px;
+      color: var(--txt3);
+      margin-bottom: 14px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .audit-section-title::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: var(--border);
+    }
+
+    /* Scorecard table */
+    .scorecard th { background: rgba(255,255,255,.03); }
+    .status-badge {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 4px;
+      font-size: 10.5px;
+      font-weight: 600;
+    }
+    .status-out  { background: rgba(16,185,129,.15); color: var(--green); }
+    .status-ok   { background: rgba(37,99,235,.15);  color: #60a5fa; }
+    .status-mon  { background: rgba(245,158,11,.15); color: var(--yellow); }
+    .status-lag  { background: rgba(239,68,68,.15);  color: var(--red); }
+
+    /* Gap map */
+    .gap-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 10px; }
+    .gap-item {
+      padding: 10px 14px;
+      border-radius: 8px;
+      border: 1px solid;
+      font-size: 12px;
+    }
+    .gap-covered  { border-color: rgba(16,185,129,.3); background: rgba(16,185,129,.07); }
+    .gap-partial  { border-color: rgba(245,158,11,.3); background: rgba(245,158,11,.07); }
+    .gap-missing  { border-color: rgba(239,68,68,.2);  background: rgba(239,68,68,.05); }
+    .gap-dot {
+      display: inline-block;
+      width: 7px; height: 7px;
+      border-radius: 50%;
+      margin-right: 6px;
+      vertical-align: middle;
+    }
+    .gap-name  { font-weight: 600; }
+    .gap-note  { font-size: 10.5px; margin-top: 3px; }
+    .gap-covered .gap-note  { color: var(--green); }
+    .gap-partial .gap-note  { color: var(--yellow); }
+    .gap-missing .gap-note  { color: var(--txt3); }
+
+    /* Adjustment cards */
+    .adj-cards { display: flex; flex-direction: column; gap: 12px; }
+    .adj-card {
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 16px 18px;
+      display: flex;
+      gap: 16px;
+      align-items: flex-start;
+    }
+    .adj-num {
+      width: 30px; height: 30px;
+      background: var(--blue);
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 14px; font-weight: 700;
+      flex-shrink: 0;
+    }
+    .adj-title { font-size: 13.5px; font-weight: 700; margin-bottom: 5px; }
+    .adj-action {
+      display: inline-block;
+      font-size: 11px;
+      padding: 2px 8px;
+      border-radius: 4px;
+      margin-bottom: 6px;
+      font-weight: 600;
+    }
+    .adj-sell { background: rgba(239,68,68,.15); color: var(--red); }
+    .adj-buy  { background: rgba(16,185,129,.15); color: var(--green); }
+    .adj-swap { background: rgba(245,158,11,.15); color: var(--yellow); }
+    .adj-body { font-size: 12px; color: var(--txt3); line-height: 1.55; }
+    .adj-ticker { color: var(--teal); font-family: monospace; font-weight: 700; }
+
+    /* Correlation matrix */
+    .corr-wrap { overflow-x: auto; }
+    .corr-grid {
+      display: grid;
+      gap: 3px;
+      min-width: 540px;
+    }
+    .corr-head {
+      font-size: 10px; font-weight: 700; color: var(--txt2);
+      text-align: center; padding: 4px 2px;
+    }
+    .corr-row-label {
+      font-size: 10px; font-weight: 700; color: var(--txt2);
+      display: flex; align-items: center; padding-right: 6px;
+    }
+    .corr-cell {
+      border-radius: 5px;
+      height: 38px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 11px; font-weight: 700;
+    }
+    .corr-legend {
+      display: flex; gap: 14px; flex-wrap: wrap;
+      margin-top: 10px; font-size: 11px; color: var(--txt3);
+    }
+    .corr-legend-dot {
+      display: inline-block; width: 10px; height: 10px;
+      border-radius: 2px; margin-right: 5px; vertical-align: middle;
+    }
+
+    /* Health check list */
+    .health-list { display: flex; flex-direction: column; gap: 7px; margin-top: 4px; }
+    .health-item {
+      display: flex; align-items: flex-start; gap: 12px;
+      background: rgba(255,255,255,.02);
+      border-radius: 8px;
+      padding: 10px 14px;
+      border-left: 3px solid var(--border);
+    }
+    .h-pass { border-left-color: #10b981; }
+    .h-warn { border-left-color: #f59e0b; }
+    .h-fail { border-left-color: #ef4444; }
+    .health-icon { font-size: 15px; flex-shrink: 0; line-height: 1.5; }
+    .health-title { font-size: 13px; font-weight: 600; color: var(--txt); margin-bottom: 3px; }
+    .health-desc  { font-size: 12px; color: var(--txt2); line-height: 1.55; }
+    .corr-two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 28px; }
+    @media (max-width: 720px) { .corr-two-col { grid-template-columns: 1fr; } }
+
+    /* Simulator */
+    .sim-controls { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; margin-bottom: 14px; }
+    .sim-select, .sim-input {
+      background: var(--bg); border: 1px solid var(--border); color: var(--txt);
+      border-radius: 8px; padding: 9px 12px; font-size: 13px;
+    }
+    .sim-add-btn {
+      background: var(--blue); color: #fff; border: none; border-radius: 8px;
+      padding: 9px 16px; font-size: 13px; font-weight: 600; cursor: pointer;
+    }
+    .sim-add-btn:hover { filter: brightness(1.1); }
+    .sim-position-list { display: flex; flex-direction: column; gap: 7px; }
+    .sim-position-row {
+      display: flex; align-items: center; justify-content: space-between;
+      background: rgba(255,255,255,.03); border-radius: 8px; padding: 10px 14px;
+    }
+    .sim-position-remove { background: none; border: none; color: var(--red); cursor: pointer; font-size: 12px; font-weight: 600; }
+    .sim-metrics-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 12px; margin: 18px 0; }
+    .sim-metric-card { background: rgba(255,255,255,.03); border: 1px solid var(--border); border-radius: 10px; padding: 14px 16px; }
+    .sim-metric-label { font-size: 10.5px; color: var(--txt3); text-transform: uppercase; letter-spacing: .5px; }
+    .sim-metric-val { font-size: 21px; font-weight: 700; margin-top: 5px; }
+    .sim-metric-delta { font-size: 11px; margin-top: 3px; }
+    .sim-chart-wrap { max-width: 260px; margin: 0 auto; }
+    .sim-corr-table { width: 100%; font-size: 11.5px; border-collapse: collapse; }
+    .sim-corr-table td { padding: 6px 4px; text-align: center; }
+    .sim-corr-table td:first-child { text-align: left; font-weight: 700; }
+    .sim-amount-input {
+      background: var(--bg); border: 1px solid var(--border); color: var(--txt);
+      border-radius: 6px; padding: 4px 8px; font-size: 12px; width: 90px;
+    }
+    .sim-cap-row { display: flex; gap: 16px; flex-wrap: wrap; margin-bottom: 14px; }
+    .sim-cap-card { flex: 1; min-width: 200px; background: rgba(255,255,255,.03); border: 1px solid var(--border); border-radius: 10px; padding: 10px 14px; }
+    .sim-cap-label { font-size: 10.5px; color: var(--txt3); text-transform: uppercase; letter-spacing: .5px; }
+    .sim-cap-val { font-size: 16px; font-weight: 700; margin-top: 3px; }
+    .sim-cap-bar-track { height: 6px; background: var(--border); border-radius: 3px; margin-top: 8px; overflow: hidden; }
+    .sim-cap-bar-fill { height: 100%; background: var(--blue); border-radius: 3px; transition: width .2s; }
+    .sim-chart-wrap.clickable { cursor: pointer; position: relative; }
+    .sim-chart-wrap.clickable:hover::after {
+      content: 'Click for detail'; position: absolute; bottom: -18px; left: 50%; transform: translateX(-50%);
+      font-size: 10px; color: var(--txt3);
+    }
+    .sim-save-row { display: flex; gap: 12px; flex-wrap: wrap; margin-top: 14px; }
+    .sim-save-card {
+      flex: 1; min-width: 220px; background: rgba(255,255,255,.03); border: 1px solid var(--border);
+      border-radius: 10px; padding: 12px 14px; display: flex; align-items: center; justify-content: space-between; gap: 10px; font-size: 12px;
+    }
+    .sim-save-empty { color: var(--txt3); }
+    .sim-combined-banner {
+      background: rgba(37,99,235,.1); border: 1px solid rgba(37,99,235,.3); border-radius: 8px;
+      padding: 10px 14px; font-size: 12.5px; color: #93c5fd; display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px;
+    }
+  </style>
+</head>
+<body>
+
+<!-- ═══ HEADER ═══ -->
+<header class="header">
+  <div class="logo">
+    <div class="logo-icon">📈</div>
+    <div>
+      <h1>Alexis Investment Portfolio</h1>
+      <p>Personal Wealth Dashboard · Long-Term Growth</p>
+    </div>
+  </div>
+  <div class="header-right">
+    <span id="lastUpdated">Fetching live prices…</span>
+    <button class="btn btn-primary" id="refreshBtn" onclick="loadAll()">↻ Refresh Prices</button>
+  </div>
+</header>
+
+<!-- ═══ MAIN ═══ -->
+<main class="wrap">
+
+  <!-- Account selector -->
+  <div class="tabs">
+    <button class="tab active" onclick="switchAccount('individual')">Individual Brokerage <sup>Z37613684</sup></button>
+    <button class="tab"        onclick="switchAccount('roth')">Roth IRA <sup>258878634</sup></button>
+    <button class="tab"        onclick="switchAccount('combined')">Combined View</button>
+    <button class="btn-audit"  onclick="openAudit()">🔍 Run Portfolio Audit</button>
+    <button class="btn-audit"  onclick="openSimulator()" style="background:rgba(37,99,235,.1);border-color:rgba(37,99,235,.3);color:#60a5fa">🧪 Simulate Changes</button>
+  </div>
+
+  <!-- API rate-limit warning (shown if needed) -->
+  <div class="api-warn" id="apiWarn">
+    ⚠ Alpha Vantage rate limit reached. Benchmark prices may be unavailable — holding prices still load from Google Sheets.
+  </div>
+
+  <!-- Metric cards -->
+  <div class="metrics">
+    <div class="mcard">
+      <div class="mlabel">Total Value</div>
+      <div class="mval" id="mVal">—</div>
+      <div class="msub" id="mValSub">Loading…</div>
+    </div>
+    <div class="mcard">
+      <div class="mlabel">Today's Gain / Loss</div>
+      <div class="mval" id="mToday">—</div>
+      <div class="msub" id="mTodaySub">vs yesterday's close</div>
+    </div>
+    <div class="mcard">
+      <div class="mlabel">Total Gain / Loss</div>
+      <div class="mval" id="mTotal">—</div>
+      <div class="msub" id="mTotalSub">since purchase</div>
+    </div>
+    <div class="mcard">
+      <div class="mlabel">Positions</div>
+      <div class="mval" id="mPos">—</div>
+      <div class="msub" id="mPosSub">across sectors</div>
+    </div>
+  </div>
+
+  <!-- Holdings + Charts -->
+  <div class="main-grid">
+    <div class="card">
+      <div class="card-head">
+        <div>
+          <div class="card-title" id="holdTitle">Holdings</div>
+          <div class="card-sub">Live prices via Google Sheets · Total return since purchase</div>
+        </div>
+      </div>
+      <table>
+        <thead>
+          <tr>
+            <th>Symbol</th>
+            <th>Sector</th>
+            <th>Shares</th>
+            <th>Live Price</th>
+            <th>Market Value</th>
+            <th>Today</th>
+            <th>Total G/L</th>
+            <th>% of Acct</th>
+          </tr>
+        </thead>
+        <tbody id="tBody">
+          <tr><td colspan="8" style="padding:22px;text-align:center;color:var(--txt3)">
+            <span class="spin"></span>Loading positions…
+          </td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="right-col">
+      <div class="card">
+        <div class="card-head"><div class="card-title">Asset Allocation</div></div>
+        <div class="chart-wrap"><canvas id="cAlloc"></canvas></div>
+      </div>
+      <div class="card">
+        <div class="card-head"><div class="card-title">Sector Breakdown</div></div>
+        <div class="chart-wrap"><canvas id="cSector"></canvas></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Benchmarks + Recommendations -->
+  <div class="bottom-grid">
+    <div class="card">
+      <div class="card-head">
+        <div>
+          <div class="card-title">Benchmark Comparison</div>
+          <div class="card-sub">Your total return vs each ETF's index</div>
+        </div>
+      </div>
+      <div id="bmContent"><div style="padding:22px;text-align:center;color:var(--txt3)"><span class="spin"></span>Loading…</div></div>
+    </div>
+
+    <div class="card">
+      <div class="card-head">
+        <div>
+          <div class="card-title">Sector Recommendations</div>
+          <div class="card-sub">Portfolio gaps to explore · Updated with Claude analysis</div>
+        </div>
+      </div>
+      <div id="recContent"></div>
+    </div>
+  </div>
+
+</main>
+
+<!-- ═══ AUDIT OVERLAY ═══ -->
+<div class="audit-overlay" id="auditOverlay">
+  <div class="audit-modal">
+    <div class="audit-header">
+      <div>
+        <h2>Portfolio Audit Report</h2>
+        <p id="auditDate">Generated —</p>
+      </div>
+      <button class="audit-close" onclick="closeAudit()">✕</button>
+    </div>
+    <div class="audit-body">
+
+      <!-- Section 1: Scorecard -->
+      <div>
+        <div class="audit-section-title">1 — Performance Scorecard</div>
+        <table class="scorecard">
+          <thead>
+            <tr>
+              <th>Symbol</th>
+              <th>Account</th>
+              <th>Sector</th>
+              <th>Total Return</th>
+              <th>vs Benchmark</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody id="auditScorecard"></tbody>
+        </table>
+      </div>
+
+      <!-- Section 2: Market Coverage -->
+      <div>
+        <div class="audit-section-title">2 — Global Market Coverage</div>
+        <div class="gap-grid" id="auditGapGrid"></div>
+      </div>
+
+      <!-- Section 3: Adjustments -->
+      <div>
+        <div class="audit-section-title">3 — Three Adjustments to Make Today</div>
+        <div class="adj-cards" id="auditAdjCards"></div>
+      </div>
+
+      <!-- Section 4: Correlation & Health -->
+      <div>
+        <div class="audit-section-title">4 — Correlation & Portfolio Health</div>
+        <div class="corr-two-col">
+          <div>
+            <div style="font-size:12px;color:var(--txt3);margin-bottom:8px">Correlation grounded in each fund's actual Morningstar sector weightings, beta, and regional exposure data.</div>
+            <div class="corr-wrap">
+              <div class="corr-grid" id="auditCorrGrid"></div>
+            </div>
+            <div class="corr-legend">
+              <span><span class="corr-legend-dot" style="background:#ef4444"></span>Very High ≥0.85</span>
+              <span><span class="corr-legend-dot" style="background:#f97316"></span>High 0.70–0.84</span>
+              <span><span class="corr-legend-dot" style="background:#f59e0b"></span>Moderate 0.50–0.69</span>
+              <span><span class="corr-legend-dot" style="background:#334155"></span>Low 0.30–0.49</span>
+              <span><span class="corr-legend-dot" style="background:#10b981"></span>Very Low &lt;0.30</span>
+            </div>
+          </div>
+          <div>
+            <div style="font-size:12px;color:var(--txt3);margin-bottom:8px">Checks against core principles of a market-capturing, balanced portfolio.</div>
+            <div class="health-list" id="auditHealthList"></div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- ═══ PORTFOLIO SIMULATOR (hypothetical, does not affect real holdings) ═══ -->
+<div class="audit-overlay" id="simOverlay">
+  <div class="audit-modal">
+    <div class="audit-header">
+      <div>
+        <h2>Portfolio Simulator</h2>
+        <p>Hypothetical — does not change your real holdings or account balances</p>
+      </div>
+      <button class="audit-close" onclick="closeSimulator()">✕</button>
+    </div>
+    <div class="audit-body">
+
+      <div id="simCombinedBanner" style="display:none">
+        <div class="sim-combined-banner">
+          <span>Viewing <b>Portfolio A + Portfolio B combined</b> (read-only)</span>
+          <button class="sim-add-btn" style="background:rgba(255,255,255,.1)" onclick="exitCombinedView()">← Back to my simulation</button>
+        </div>
+      </div>
+
+      <div id="simLiveControls">
+        <div class="audit-section-title">Available to Simulate (per account)</div>
+        <div class="sim-cap-row" id="simCapRow"></div>
+
+        <div class="audit-section-title">Add a Hypothetical Position</div>
+        <div class="sim-controls">
+          <select class="sim-select" id="simAccountSelect" onchange="renderSimAnalytics()">
+            <option value="individual">Individual Brokerage</option>
+            <option value="roth">Roth IRA</option>
+          </select>
+          <select class="sim-select" id="simTickerSelect"></select>
+          <input class="sim-input" id="simAmount" type="number" placeholder="Dollar amount" min="1" step="1" style="width:140px">
+          <button class="sim-add-btn" onclick="addSimPosition()">+ Add to Simulation</button>
+          <button class="sim-add-btn" style="background:rgba(255,255,255,.08);color:var(--txt2)" onclick="resetSimulator()">Reset</button>
+        </div>
+        <div class="sim-position-list" id="simPositionList"></div>
+      </div>
+
+      <div>
+        <div class="audit-section-title">Impact on Your Combined Portfolio</div>
+        <div class="sim-metrics-row" id="simMetrics"></div>
+        <div class="corr-two-col">
+          <div>
+            <div style="font-size:12px;color:var(--txt3);margin-bottom:8px">Sector allocation including simulated positions</div>
+            <div class="sim-chart-wrap clickable" onclick="openSimDetail()"><canvas id="simChart"></canvas></div>
+          </div>
+          <div>
+            <div style="font-size:12px;color:var(--txt3);margin-bottom:8px">Correlation of new ETF(s) vs your current holdings</div>
+            <div id="simCorrPreview" style="font-size:12px;color:var(--txt3)">Add a position above to see correlation.</div>
+          </div>
+        </div>
+      </div>
+
+      <div>
+        <div class="audit-section-title">Saved Portfolios <span style="font-weight:400;text-transform:none;letter-spacing:0">(max 2 — saved in this browser)</span></div>
+        <div class="sim-save-row" id="simSaveSlots"></div>
+        <button class="sim-add-btn" id="simCombineBtn" style="display:none;margin-top:12px" onclick="viewCombinedSim()">View Combined (A + B)</button>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- ═══ SIM DETAIL POPUP (click chart) ═══ -->
+<div class="audit-overlay" id="simDetailOverlay" style="z-index:300">
+  <div class="audit-modal" style="max-width:760px">
+    <div class="audit-header">
+      <div>
+        <h2>Simulated Portfolio Detail</h2>
+        <p>Sector breakdown, estimated risk, and full correlation matrix</p>
+      </div>
+      <button class="audit-close" onclick="closeSimDetail()">✕</button>
+    </div>
+    <div class="audit-body">
+      <div>
+        <div class="audit-section-title">Sector Breakdown</div>
+        <table class="scorecard">
+          <thead><tr><th>Sector</th><th>Value</th><th>% of Portfolio</th></tr></thead>
+          <tbody id="simDetailSectorBody"></tbody>
+        </table>
+      </div>
+      <div>
+        <div class="audit-section-title">Estimated Portfolio Risk</div>
+        <div id="simDetailRisk"></div>
+      </div>
+      <div>
+        <div class="audit-section-title">Correlation Matrix</div>
+        <div class="corr-wrap"><div class="corr-grid" id="simDetailCorrGrid"></div></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<footer class="footer">
+  Data provided by Google Sheets (GOOGLEFINANCE) & Alpha Vantage · For personal informational use only — not financial advice.<br>
+  Portfolio as of Jun 11 2026 · Dashboard built with Claude Code
+</footer>
+
+<script>
+/* ══════════════════════════════════════════════════
+   CONFIGURATION
+══════════════════════════════════════════════════ */
+const AV_KEY    = '2F3B0VLK5BVZUPI4';
+const AV_BASE   = 'https://www.alphavantage.co/query';
+const GS_CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSRqh2W5nDBekg4izP-lddiVuSuKkumpHgn6CpqgHGgyG1dE5UyuZ-4e_vNqw9piL6IDpLJhX-CZqjT/pub?gid=0&single=true&output=csv';
+
+/* ══════════════════════════════════════════════════
+   PORTFOLIO DATA  (update this section when you
+   buy / sell — Claude will do it for you)
+══════════════════════════════════════════════════ */
+const DATA = {
+  individual: {
+    label: 'Individual Brokerage',
+    risk:  'Aggressive Growth',
+    holdings: [
+      { sym:'VOLT',  name:'TEMA Electrification ETF',        qty:0.649, cost:24.98,  sector:'Clean Energy',   color:'#10b981', bm:'SPY',  bmName:'S&P 500',       beta:1.30 },
+      { sym:'ELFY',  name:'ALPS Electrification ETF',        qty:0.582, cost:24.99,  sector:'Clean Energy',   color:'#10b981', bm:'SPY',  bmName:'S&P 500',       beta:1.30 },
+      { sym:'DTCR',  name:'Global X Data Center & Digital',  qty:0.813, cost:25.00,  sector:'Data Centers',   color:'#06b6d4', bm:'QQQ',  bmName:'NASDAQ 100',    beta:1.45 },
+      { sym:'ARTY',  name:'iShares Future AI & Tech ETF',    qty:0.351, cost:24.94,  sector:'AI & Tech',      color:'#8b5cf6', bm:'QQQ',  bmName:'NASDAQ 100',    beta:2.05 },
+    ]
+  },
+  roth: {
+    label: 'Roth IRA',
+    risk:  'Conservative Growth',
+    holdings: [
+      { sym:'SOXX',  name:'iShares Semiconductor ETF',        qty:0.072,  cost:24.74,  sector:'Semiconductors', color:'#f59e0b', bm:'SOXX', bmName:'PHLX Semi',     beta:2.26 },
+      { sym:'LDRH',  name:'iBonds 1-5yr High Yield Ladder',   qty:1.025,  cost:24.99,  sector:'Fixed Income',   color:'#64748b', bm:'BND',  bmName:'Total Bond Mkt', beta:0.15 },
+      { sym:'FFNOX', name:'Fidelity Multi-Asset Index Fund',  qty:2.919,  cost:200.00, sector:'Multi-Asset',    color:'#2563eb', bm:'SPY',  bmName:'S&P 500',       beta:1.19 },
+    ]
+  }
+};
+
+/* ══════════════════════════════════════════════════
+   RECOMMENDATIONS  (Claude updates this section
+   based on Morningstar reports & portfolio gaps)
+══════════════════════════════════════════════════ */
+const RECS = [
+  {
+    sector:  'Healthcare / Biotech',
+    tickers: 'XLV · IBB · ARKG',
+    badge:   'Gap',
+    note:    'Zero healthcare exposure across both accounts. A 15–50 yr horizon makes biotech innovation a strong thematic fit. XLV (broad, low-risk) for Roth; ARKG (high-conviction growth) for Brokerage.'
+  },
+  {
+    sector:  'Dividend Income',
+    tickers: 'SCHD · VIG · DVY',
+    badge:   'Gap',
+    note:    'Your Roth IRA is tax-sheltered — ideal for dividend compounding tax-free. SCHD has outperformed SPY over 10 yrs with lower drawdowns.'
+  },
+  {
+    sector:  'International / Emerging Markets',
+    tickers: 'VWO · IEMG · EEM',
+    badge:   'Gap',
+    note:    'FFNOX has some int\'l exposure but is U.S.-heavy. A dedicated EM position diversifies geopolitical risk across your long horizon.'
+  },
+  {
+    sector:  'Energy / Infrastructure',
+    tickers: 'XLE · ICLN · MLPA',
+    badge:   'Partial',
+    note:    'VOLT & ELFY cover clean-energy electrification but miss traditional energy & midstream. XLE acts as inflation hedge; ICLN extends your clean-energy thesis.'
+  },
+  {
+    sector:  'Consumer Staples',
+    tickers: 'XLP · VDC',
+    badge:   'Defensive',
+    note:    'Adds recession resistance to balance your growth-heavy brokerage. Staples outperform in downturns — useful anchor over a multi-decade hold.'
+  }
+];
+
+/* ══════════════════════════════════════════════════
+   STATE
+══════════════════════════════════════════════════ */
+let activeAcct   = 'individual';
+let quotes       = {};          // sym → { price, change, changePct }
+let chartAlloc   = null;
+let chartSector  = null;
+let apiWarned    = false;
+let simPositions = [];          // hypothetical positions: { sym, amount, acct }
+let simChart     = null;
+let simViewMode  = 'live';      // 'live' | 'combined'
+
+/* ══════════════════════════════════════════════════
+   GOOGLE SHEETS — primary price source (unlimited)
+══════════════════════════════════════════════════ */
+async function fetchGoogleSheetPrices() {
+  try {
+    const resp = await fetch(GS_CSV_URL);
+    if (!resp.ok) return false;
+    const text = await resp.text();
+    let loaded = 0;
+    for (const row of text.trim().split('\n')) {
+      const parts      = row.split(',').map(s => s.trim().replace(/"/g, ''));
+      const sym        = parts[0];
+      const priceStr   = parts[1];
+      const chgPctStr  = parts[2]; // column C: =GOOGLEFINANCE(sym,"changepct")
+      if (!sym || !priceStr || priceStr.startsWith('#') || priceStr === 'N/A') continue;
+      const price = parseFloat(priceStr);
+      if (isNaN(price) || price <= 0) continue;
+      const changePct = (chgPctStr && !chgPctStr.startsWith('#') && chgPctStr !== 'N/A')
+        ? parseFloat(chgPctStr) : null;
+      const change = (changePct !== null && !isNaN(changePct))
+        ? price * changePct / 100 : null;
+      quotes[sym] = { price, change, changePct };
+      loaded++;
+    }
+    return loaded > 0;
+  } catch (e) {
+    console.warn('Google Sheets fetch failed, falling back to Alpha Vantage:', e);
+    return false;
+  }
+}
+
+/* ══════════════════════════════════════════════════
+   ALPHA VANTAGE — benchmarks + GS fallback
+══════════════════════════════════════════════════ */
+async function fetchQuote(sym) {
+  const key = 'av_' + sym;
+  const cached = sessionStorage.getItem(key);
+  if (cached) return JSON.parse(cached);
+
+  try {
+    const url  = `${AV_BASE}?function=GLOBAL_QUOTE&symbol=${sym}&apikey=${AV_KEY}`;
+    const resp = await fetch(url);
+    const json = await resp.json();
+    const gq   = json['Global Quote'];
+
+    if (!gq || !gq['05. price']) {
+      // Possibly rate-limited or symbol not found
+      if (json['Note'] || json['Information']) showApiWarn();
+      return null;
+    }
+
+    const result = {
+      price:     parseFloat(gq['05. price']),
+      change:    parseFloat(gq['09. change']),
+      changePct: parseFloat(gq['10. change percent']),
+    };
+    sessionStorage.setItem(key, JSON.stringify(result));
+    return result;
+  } catch (e) {
+    console.warn('AV fetch error:', sym, e);
+    return null;
+  }
+}
+
+function showApiWarn() {
+  if (!apiWarned) {
+    document.getElementById('apiWarn').style.display = 'block';
+    apiWarned = true;
+  }
+}
+
+async function loadAll() {
+  const btn = document.getElementById('refreshBtn');
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spin"></span>Updating…';
+  apiWarned = false;
+  quotes = {};
+  document.getElementById('apiWarn').style.display = 'none';
+
+  // Clear AV session cache
+  Object.keys(sessionStorage).filter(k => k.startsWith('av_')).forEach(k => sessionStorage.removeItem(k));
+
+  // Step 1 — load holding prices from Google Sheets (no rate limit, no API key)
+  await fetchGoogleSheetPrices();
+
+  // Step 2 — fetch benchmarks + any holdings GS didn't cover via Alpha Vantage
+  const allHoldings   = allAcctHoldings();
+  const benchmarkSyms = [...new Set(allHoldings.map(h => h.bm))];
+  const holdingSyms   = [...new Set(allHoldings.map(h => h.sym))];
+  const allSyms       = [...holdingSyms, ...benchmarkSyms.filter(b => !holdingSyms.includes(b))];
+  const needAV        = allSyms.filter(sym => !quotes[sym]);
+
+  for (const sym of needAV) {
+    const q = await fetchQuote(sym);
+    if (q) quotes[sym] = q;
+    await delay(250);
+  }
+
+  const t = new Date();
+  document.getElementById('lastUpdated').textContent =
+    `Updated ${t.toLocaleDateString('en-US',{month:'short',day:'numeric'})} at ${t.toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit'})}`;
+
+  btn.disabled = false;
+  btn.innerHTML = '↻ Refresh Prices';
+
+  renderAll();
+}
+
+function delay(ms) { return new Promise(r => setTimeout(r, ms)); }
+
+/* ══════════════════════════════════════════════════
+   HELPERS
+══════════════════════════════════════════════════ */
+function allAcctHoldings() {
+  return [
+    ...DATA.individual.holdings.map(h => ({ ...h, acct: 'Individual' })),
+    ...DATA.roth.holdings.map(h =>       ({ ...h, acct: 'Roth IRA' }))
+  ];
+}
+
+function activeHoldings() {
+  if (activeAcct === 'combined') return allAcctHoldings();
+  return DATA[activeAcct].holdings.map(h => ({ ...h }));
+}
+
+function livePrice(h) {
+  return quotes[h.sym] ? quotes[h.sym].price : h.cost / h.qty;
+}
+
+function fmt$(n)   { return (n < 0 ? '-$' : '$') + Math.abs(n).toFixed(2); }
+function fmtPct(n) { return (n >= 0 ? '+' : '') + n.toFixed(2) + '%'; }
+function clr(n)    { return n >= 0 ? 'pos' : 'neg'; }
+
+/* ══════════════════════════════════════════════════
+   RENDER
+══════════════════════════════════════════════════ */
+function switchAccount(acct) {
+  activeAcct = acct;
+  document.querySelectorAll('.tab').forEach((t, i) => {
+    t.classList.toggle('active', ['individual','roth','combined'][i] === acct);
+  });
+  renderAll();
+}
+
+function renderAll() {
+  renderMetrics();
+  renderTable();
+  renderCharts();
+  renderBenchmarks();
+  renderRecs();
+}
+
+function renderMetrics() {
+  const H = activeHoldings();
+  let totVal = 0, totCost = 0, todayGL = 0;
+  H.forEach(h => {
+    const p = livePrice(h);
+    totVal  += p * h.qty;
+    totCost += h.cost;
+    if (quotes[h.sym] && quotes[h.sym].change !== null) todayGL += quotes[h.sym].change * h.qty;
+  });
+  const totalGLAmt = totVal - totCost;
+  const totalGLPct = (totalGLAmt / totCost) * 100;
+  const todayPct   = totVal > 0 ? (todayGL / (totVal - todayGL)) * 100 : 0;
+  const sectors    = new Set(H.map(h => h.sector)).size;
+
+  set('mVal',      '$' + totVal.toFixed(2));
+  set('mValSub',   'Cost basis: $' + totCost.toFixed(2));
+
+  setGain('mToday',    'mTodaySub',  todayGL, fmtPct(todayPct) + ' vs yesterday');
+  setGain('mTotal',    'mTotalSub',  totalGLAmt, fmtPct(totalGLPct) + ' total return');
+
+  set('mPos',    H.length.toString());
+  set('mPosSub', `Across ${sectors} sector${sectors !== 1 ? 's' : ''}`);
+
+  const acctName = activeAcct === 'combined' ? 'Combined Portfolio'
+                 : activeAcct === 'individual' ? 'Individual Brokerage'
+                 : 'Roth IRA';
+  set('holdTitle', acctName + ' — Holdings');
+}
+
+function setGain(valId, subId, amount, subText) {
+  const el  = document.getElementById(valId);
+  const sub = document.getElementById(subId);
+  el.textContent  = fmt$(amount);
+  el.className    = 'mval ' + clr(amount);
+  sub.textContent = subText;
+  sub.className   = 'msub ' + clr(amount);
+}
+
+function set(id, txt) { document.getElementById(id).textContent = txt; }
+
+function renderTable() {
+  const H = activeHoldings();
+  let totVal = H.reduce((s, h) => s + livePrice(h) * h.qty, 0);
+
+  document.getElementById('tBody').innerHTML = H.map(h => {
+    const q       = quotes[h.sym];
+    const price   = livePrice(h);
+    const value   = price * h.qty;
+    const todayGL = (q && q.change !== null) ? q.change * h.qty : null;
+    const todayP  = (q && q.changePct !== null) ? q.changePct : null;
+    const totalGL = value - h.cost;
+    const totalP  = (totalGL / h.cost) * 100;
+    const pctAcct = (value / totVal) * 100;
+    const acctPill= h.acct ? `<span class="acct-pill">${h.acct}</span>` : '';
+    const priceStr= q ? '$' + price.toFixed(2) : `<span style="color:var(--txt3)">~$${price.toFixed(2)}</span>`;
+
+    return `<tr>
+      <td>
+        <span class="sym">${h.sym}</span>${acctPill}
+        <div class="hname">${h.name}</div>
+      </td>
+      <td><span class="stag" style="background:${h.color}1a;color:${h.color}">${h.sector}</span></td>
+      <td style="color:var(--txt2)">${h.qty}</td>
+      <td>${priceStr}</td>
+      <td style="font-weight:600">${fmt$(value)}</td>
+      <td class="${todayGL !== null ? clr(todayGL) : ''}">
+        ${todayGL !== null ? fmt$(todayGL) + ' (' + fmtPct(todayP) + ')' : '<span style="color:var(--txt3)">—</span>'}
+      </td>
+      <td class="${clr(totalGL)}">${fmt$(totalGL)} (${fmtPct(totalP)})</td>
+      <td style="color:var(--txt2)">${pctAcct.toFixed(1)}%</td>
+    </tr>`;
+  }).join('');
+}
+
+function renderCharts() {
+  const H      = activeHoldings();
+  const totVal = H.reduce((s, h) => s + livePrice(h) * h.qty, 0);
+
+  // Allocation by position
+  const aLabels = H.map(h => h.sym);
+  const aData   = H.map(h => ((livePrice(h) * h.qty) / totVal * 100).toFixed(1));
+  const aColors = H.map(h => h.color);
+
+  // Sector aggregation
+  const secMap = {};
+  H.forEach(h => {
+    const v = livePrice(h) * h.qty;
+    if (!secMap[h.sector]) secMap[h.sector] = { val: 0, color: h.color };
+    secMap[h.sector].val += v;
+  });
+  const sLabels = Object.keys(secMap);
+  const sData   = sLabels.map(s => (secMap[s].val / totVal * 100).toFixed(1));
+  const sColors = sLabels.map(s => secMap[s].color);
+
+  const opts = (type) => ({
+    type,
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: { position:'right', labels:{ color:'#94a3b8', font:{size:10}, boxWidth:11, padding:6 } },
+        tooltip: { callbacks: { label: ctx => ` ${ctx.label}: ${ctx.parsed}%` } }
+      }
+    }
+  });
+
+  if (chartAlloc)  chartAlloc.destroy();
+  if (chartSector) chartSector.destroy();
+
+  const base = { borderColor:'#0f1629', borderWidth:2 };
+
+  chartAlloc  = new Chart(document.getElementById('cAlloc'),  { ...opts('doughnut'), data:{ labels:aLabels, datasets:[{ data:aData, backgroundColor:aColors, ...base }] } });
+  chartSector = new Chart(document.getElementById('cSector'), { ...opts('doughnut'), data:{ labels:sLabels, datasets:[{ data:sData, backgroundColor:sColors, ...base }] } });
+}
+
+function renderBenchmarks() {
+  const H = activeHoldings();
+  const rows = H.map(h => {
+    const q     = quotes[h.sym];
+    if (!q) return null;
+    const myRet = ((livePrice(h) * h.qty - h.cost) / h.cost) * 100;
+    const bmQ   = quotes[h.bm];
+    const bmRet = bmQ ? bmQ.changePct : null;
+    const diff  = bmRet !== null ? myRet - bmRet : null;
+    const maxV  = Math.max(Math.abs(myRet), 5);
+    const barW  = Math.min(Math.abs(myRet) / maxV * 100, 100);
+    const barC  = myRet >= 0 ? '#10b981' : '#ef4444';
+
+    return `<div class="bm-row">
+      <div>
+        <div class="bm-sym">${h.sym}</div>
+        <div class="bm-label">vs ${h.bmName}</div>
+      </div>
+      <div class="bm-bar-bg"><div class="bm-bar" style="width:${barW}%;background:${barC}"></div></div>
+      <div>
+        <div class="bm-pct ${clr(myRet)}">${fmtPct(myRet)}</div>
+        ${diff !== null ? `<div class="bm-vs">${diff >= 0 ? '+' : ''}${diff.toFixed(1)}% vs bm</div>` : ''}
+      </div>
+    </div>`;
+  }).filter(Boolean).join('');
+
+  document.getElementById('bmContent').innerHTML = rows ||
+    '<div style="padding:20px;text-align:center;color:var(--txt3)">Prices loading… click Refresh</div>';
+}
+
+function renderRecs() {
+  document.getElementById('recContent').innerHTML = RECS.map(r => `
+    <div class="rec">
+      <div class="rec-head">
+        <span class="rec-sector">${r.sector}</span>
+        <span class="rec-badge">${r.badge}</span>
+      </div>
+      <div class="rec-tickers">${r.tickers}</div>
+      <div class="rec-note">${r.note}</div>
+    </div>
+  `).join('');
+}
+
+/* ══════════════════════════════════════════════════
+   PORTFOLIO AUDIT
+══════════════════════════════════════════════════ */
+
+// Market coverage map — all major GICS sectors + geographies
+const MARKET_MAP = [
+  { name:'Clean Energy / Electrification', status:'covered',  note:'VOLT, ELFY',        geo:false },
+  { name:'Data Centers / Digital Infra',   status:'covered',  note:'DTCR',              geo:false },
+  { name:'AI & Future Technology',         status:'covered',  note:'ARTY',              geo:false },
+  { name:'Semiconductors',                 status:'covered',  note:'SOXX',              geo:false },
+  { name:'Fixed Income / Bonds',           status:'covered',  note:'LDRH',              geo:false },
+  { name:'Multi-Asset (Broad Market)',     status:'covered',  note:'FFNOX',             geo:false },
+  { name:'Healthcare / Biotech',           status:'missing',  note:'0% of portfolio',   geo:false },
+  { name:'Financials / Banking',           status:'missing',  note:'0% — 13% of S&P',  geo:false },
+  { name:'Consumer Discretionary',         status:'missing',  note:'0% — 10% of S&P',  geo:false },
+  { name:'Consumer Staples (Defensive)',   status:'missing',  note:'0% — 6% of S&P',   geo:false },
+  { name:'Industrials',                    status:'missing',  note:'0% — 9% of S&P',   geo:false },
+  { name:'Real Estate / REITs',            status:'missing',  note:'0% — 2.5% of S&P', geo:false },
+  { name:'Materials / Commodities',        status:'missing',  note:'0% of portfolio',   geo:false },
+  { name:'Traditional Energy',             status:'missing',  note:'0% (inflation hdg)',geo:false },
+  { name:'US Large-Cap',                   status:'covered',  note:'Primary exposure',  geo:true  },
+  { name:'International Developed',        status:'missing',  note:'Europe, Japan, UK', geo:true  },
+  { name:'Emerging Markets',               status:'partial',  note:'Minor via FFNOX',   geo:true  },
+  { name:'US Mid-Cap',                     status:'missing',  note:'0% of portfolio',   geo:true  },
+  { name:'US Small-Cap',                   status:'missing',  note:'0% of portfolio',   geo:true  },
+];
+
+// Three specific adjustments (Claude-authored, based on audit)
+const ADJUSTMENTS = [
+  {
+    title:   'Consolidate Electrification → Add Healthcare',
+    action:  'sell',
+    label:   'SELL VOLT · BUY XLV',
+    body:    `VOLT and ELFY are highly correlated — both track electrification themes, both are down, and together they consume 50% of your Individual Brokerage. That's a concentrated bet in one sub-theme. Sell VOLT (down -0.73%, marginally worse than ELFY), take the ~$25, and buy <span class="adj-ticker">XLV</span> (Health Care Select Sector ETF). Healthcare is the single largest gap in your portfolio — 0% exposure vs 11% of the S&P 500. It's defensive (outperforms in recessions) AND has 50-year innovation tailwinds (genomics, biotech, AI diagnostics).`
+  },
+  {
+    title:   'Add Emerging Markets to Roth IRA',
+    action:  'buy',
+    label:   'BUY VWO or IEMG',
+    body:    `Your Roth IRA is essentially US-only: FFNOX is US-heavy, SOXX tracks US-listed semis, LDRH is a US bond ladder. Over a 15–50 year horizon, emerging economies (India, SE Asia, Brazil) will be a significantly larger share of global GDP. Buy <span class="adj-ticker">VWO</span> (Vanguard Emerging Markets ETF, 0.08% expense ratio — among the cheapest available) or <span class="adj-ticker">IEMG</span> in your Roth IRA. The tax-sheltered account is the ideal home for this long-term, higher-growth allocation.`
+  },
+  {
+    title:   'Investigate ARTY — Consider Swapping for QQQ',
+    action:  'swap',
+    label:   'REVIEW ARTY vs QQQ',
+    body:    `ARTY (iShares Future AI & Tech ETF) is your worst performer at -1.84% while the broader AI/tech sector has been strongly positive in 2025–2026. Before adding to this position, compare ARTY's top 10 holdings against <span class="adj-ticker">QQQ</span> (NASDAQ 100) or <span class="adj-ticker">VGT</span> (Vanguard Information Technology). If ARTY lacks sufficient weight in Nvidia, Microsoft, Meta, and Alphabet — the companies driving actual AI returns — it's the wrong vehicle for this thesis. Share the ARTY Morningstar PDF with Claude for a specific comparison.`
+  }
+];
+
+// Pairwise correlation estimates (based on sector overlap & underlying holdings)
+const CORR_SYMS  = ['VOLT','ELFY','DTCR','ARTY','SOXX','LDRH','FFNOX'];
+const CORR_TABLE = {
+  'VOLT|ELFY':0.93, 'VOLT|DTCR':0.51, 'VOLT|ARTY':0.47, 'VOLT|SOXX':0.44, 'VOLT|LDRH':0.12, 'VOLT|FFNOX':0.58,
+  'ELFY|DTCR':0.49, 'ELFY|ARTY':0.45, 'ELFY|SOXX':0.42, 'ELFY|LDRH':0.11, 'ELFY|FFNOX':0.56,
+  'DTCR|ARTY':0.78, 'DTCR|SOXX':0.73, 'DTCR|LDRH':0.08, 'DTCR|FFNOX':0.64,
+  'ARTY|SOXX':0.81, 'ARTY|LDRH':0.07, 'ARTY|FFNOX':0.68,
+  'SOXX|LDRH':0.09, 'SOXX|FFNOX':0.62,
+  'LDRH|FFNOX':0.28,
+};
+function corrVal(a, b) {
+  if (a === b) return 1;
+  return CORR_TABLE[a+'|'+b] ?? CORR_TABLE[b+'|'+a] ?? null;
+}
+function corrColor(r) {
+  if (r >= 0.85) return { bg:'rgba(239,68,68,.75)',   fg:'#fff' };
+  if (r >= 0.70) return { bg:'rgba(249,115,22,.70)',  fg:'#fff' };
+  if (r >= 0.50) return { bg:'rgba(245,158,11,.55)',  fg:'#fff' };
+  if (r >= 0.30) return { bg:'rgba(100,116,139,.35)', fg:'#94a3b8' };
+  return               { bg:'rgba(16,185,129,.30)',   fg:'#6ee7b7' };
+}
+
+const HEALTH_RULES = [
+  { status:'fail', title:'VOLT + ELFY: Critical Overlap (r = 0.93)',
+    desc:'These two ETFs track nearly identical electrification themes and hold many of the same stocks. Owning both is not diversification — it doubles your exposure to one sub-sector. One should be replaced with something uncorrelated.' },
+  { status:'warn', title:'Tech Cluster: DTCR + ARTY + SOXX (r = 0.73–0.81)',
+    desc:'Three of your seven holdings are highly correlated to each other. In a tech sector sell-off, all three fall together. This cluster represents ~37% of your combined portfolio by value.' },
+  { status:'fail', title:'No Value Factor Exposure — 100% Growth Tilted',
+    desc:'Your entire portfolio bets on high-growth companies. Over very long cycles (15–50 yrs), Value stocks historically outperform Growth. ETFs like SCHD, VTV, or XLV would add balance.' },
+  { status:'fail', title:'No International Developed Market Exposure',
+    desc:'Europe, Japan, UK, Canada, and Australia represent ~40% of global investable market cap. Zero allocation over your 50-year horizon forfeits a massive slice of global compounding.' },
+  { status:'fail', title:'No Mid-Cap or Small-Cap Exposure',
+    desc:'Small-caps have historically outperformed large-caps by ~1–2% per year over long periods (the "small-cap premium"). Every position you hold targets US large-cap companies only.' },
+  { status:'warn', title:'Fixed Income Weight Too Small (~7% of Portfolio)',
+    desc:'LDRH is the only bond holding and represents just ~7% of your portfolio. Even for aggressive growth investors, 10–15% in bonds smooths volatility and enables opportunistic rebalancing during crashes.' },
+  { status:'warn', title:'High Estimated Portfolio Beta (~1.45× S&P 500)',
+    desc:'Thematic ETFs carry significantly higher volatility than the index. Your portfolio will likely swing ~45% harder than the S&P 500 in both directions. This is fine for a long horizon but expect large drawdowns.' },
+  { status:'pass', title:'Broad Market Anchor Present — FFNOX in Roth IRA',
+    desc:'FFNOX (Fidelity Multi-Asset Index Fund) gives you a diversified index core inside your tax-free account — ideal placement for a long-horizon compounder.' },
+  { status:'pass', title:'Fixed Income Provides True Diversification (LDRH)',
+    desc:'LDRH correlates at only 0.07–0.28 with all your equity holdings. It genuinely reduces portfolio risk and is uncorrelated to the tech themes dominating your brokerage.' },
+  { status:'pass', title:'Account Placement Strategy is Sound',
+    desc:'Riskier thematic ETFs in the taxable brokerage; conservative multi-asset and bonds in the tax-sheltered Roth IRA. This is the correct structure for your dual-account strategy.' },
+];
+
+/* ══════════════════════════════════════════════════
+   PORTFOLIO SIMULATOR (hypothetical — no real trades)
+══════════════════════════════════════════════════ */
+
+// Curated ETF library to fill known portfolio gaps — sector + estimated
+// correlation to each of your current 7 holdings.
+// Correlation estimates below are grounded in the Morningstar Investment
+// Detail Reports Alexis provided (sector weightings, beta, R-squared,
+// regional exposure) rather than generic guesses. beta/exp pulled directly
+// from each report's MPT Statistics / Expense Ratio fields.
+const SIM_LIBRARY = {
+  // Healthcare
+  XLV:   { name:'Health Care Select Sector SPDR',   sector:'Healthcare',          group:'Healthcare',              color:'#ec4899', beta:0.56, exp:0.08, corr:{VOLT:0.15,ELFY:0.14,DTCR:0.20,ARTY:0.18,SOXX:0.15,LDRH:0.10,FFNOX:0.55} },
+  VHT:   { name:'Vanguard Health Care ETF',         sector:'Healthcare',          group:'Healthcare',              color:'#f472b6', beta:0.62, exp:0.09, corr:{VOLT:0.16,ELFY:0.15,DTCR:0.21,ARTY:0.19,SOXX:0.16,LDRH:0.10,FFNOX:0.56} },
+  VGHCX: { name:'Vanguard Health Care Inv (active)',sector:'Healthcare',          group:'Healthcare',              color:'#db2777', beta:0.57, exp:0.32, corr:{VOLT:0.14,ELFY:0.13,DTCR:0.19,ARTY:0.17,SOXX:0.14,LDRH:0.12,FFNOX:0.54} },
+  WELL:  { name:'Welltower Inc (Senior Housing)',   sector:'Healthcare REIT',     group:'Healthcare',              color:'#0d9488', beta:0.95, exp:0,    corr:{VOLT:0.15,ELFY:0.14,DTCR:0.35,ARTY:0.10,SOXX:0.08,LDRH:0.15,FFNOX:0.40} },
+  HR:    { name:'Healthcare Realty Trust (REIT)',   sector:'Healthcare REIT',     group:'Healthcare',              color:'#0f766e', beta:1.05, exp:0,    corr:{VOLT:0.14,ELFY:0.13,DTCR:0.30,ARTY:0.08,SOXX:0.07,LDRH:0.18,FFNOX:0.38} },
+  // Financials
+  XLF:   { name:'Financial Select Sector SPDR',     sector:'Financials',          group:'Financials',              color:'#3b82f6', beta:0.79, exp:0.08, corr:{VOLT:0.28,ELFY:0.27,DTCR:0.32,ARTY:0.30,SOXX:0.33,LDRH:0.15,FFNOX:0.60} },
+  KRE:   { name:'SPDR S&P Regional Banking ETF',    sector:'Regional Banks',      group:'Financials',              color:'#1d4ed8', beta:1.21, exp:0.35, corr:{VOLT:0.30,ELFY:0.28,DTCR:0.35,ARTY:0.20,SOXX:0.22,LDRH:0.30,FFNOX:0.58} },
+  // Industrials & Infrastructure
+  XLI:   { name:'Industrial Select Sector SPDR',    sector:'Industrials',         group:'Industrials & Infra',     color:'#f97316', beta:1.09, exp:0.08, corr:{VOLT:0.55,ELFY:0.58,DTCR:0.40,ARTY:0.35,SOXX:0.38,LDRH:0.15,FFNOX:0.68} },
+  PAVE:  { name:'Global X US Infrastructure Dev',   sector:'Infrastructure',      group:'Industrials & Infra',     color:'#ea580c', beta:1.34, exp:0.47, corr:{VOLT:0.62,ELFY:0.68,DTCR:0.42,ARTY:0.35,SOXX:0.38,LDRH:0.15,FFNOX:0.65} },
+  // Tech & Growth
+  VGT:   { name:'Vanguard Information Technology',  sector:'Technology',          group:'Tech & Growth',           color:'#6366f1', beta:1.42, exp:0.09, corr:{VOLT:0.40,ELFY:0.38,DTCR:0.65,ARTY:0.85,SOXX:0.78,LDRH:0.08,FFNOX:0.70} },
+  QQQ:   { name:'Invesco QQQ Trust',                sector:'Large-Cap Growth',    group:'Tech & Growth',           color:'#4f46e5', beta:1.23, exp:0.20, corr:{VOLT:0.42,ELFY:0.40,DTCR:0.62,ARTY:0.80,SOXX:0.75,LDRH:0.10,FFNOX:0.72} },
+  VBK:   { name:'Vanguard Small-Cap Growth ETF',    sector:'US Small-Cap Growth', group:'Tech & Growth',           color:'#a855f7', beta:1.32, exp:0.07, corr:{VOLT:0.40,ELFY:0.38,DTCR:0.45,ARTY:0.55,SOXX:0.52,LDRH:0.12,FFNOX:0.60} },
+  VO:    { name:'Vanguard Mid-Cap ETF',             sector:'US Mid-Cap',          group:'Tech & Growth',           color:'#8b5cf6', beta:0.99, exp:0.04, corr:{VOLT:0.45,ELFY:0.43,DTCR:0.48,ARTY:0.45,SOXX:0.48,LDRH:0.15,FFNOX:0.70} },
+  SCHD:  { name:'Schwab US Dividend Equity ETF',    sector:'Dividend / Value',    group:'Tech & Growth',           color:'#22c55e', beta:0.85, exp:0.06, corr:{VOLT:0.30,ELFY:0.28,DTCR:0.35,ARTY:0.30,SOXX:0.32,LDRH:0.25,FFNOX:0.62} },
+  VTV:   { name:'Vanguard Value ETF',               sector:'Large-Cap Value',     group:'Tech & Growth',           color:'#84cc16', beta:0.88, exp:0.04, corr:{VOLT:0.32,ELFY:0.30,DTCR:0.38,ARTY:0.32,SOXX:0.35,LDRH:0.20,FFNOX:0.70} },
+  // International
+  VEA:   { name:'Vanguard FTSE Developed Markets',  sector:'Intl Developed',      group:'International',           color:'#06b6d4', beta:0.97, exp:0.03, corr:{VOLT:0.36,ELFY:0.34,DTCR:0.40,ARTY:0.42,SOXX:0.45,LDRH:0.18,FFNOX:0.62} },
+  VWO:   { name:'Vanguard FTSE Emerging Markets',   sector:'Emerging Markets',    group:'International',           color:'#eab308', beta:0.78, exp:0.07, corr:{VOLT:0.35,ELFY:0.33,DTCR:0.40,ARTY:0.38,SOXX:0.42,LDRH:0.15,FFNOX:0.50} },
+  IEMG:  { name:'iShares Core MSCI Emerging Mkts',  sector:'Emerging Markets',    group:'International',           color:'#ca8a04', beta:1.01, exp:0.09, corr:{VOLT:0.34,ELFY:0.32,DTCR:0.38,ARTY:0.40,SOXX:0.45,LDRH:0.15,FFNOX:0.55} },
+  // Real Estate
+  VNQ:   { name:'Vanguard Real Estate ETF',         sector:'Real Estate / REITs', group:'Real Estate',             color:'#14b8a6', beta:1.02, exp:0.12, corr:{VOLT:0.20,ELFY:0.19,DTCR:0.55,ARTY:0.22,SOXX:0.20,LDRH:0.20,FFNOX:0.45} },
+  // Fixed Income
+  BND:   { name:'Vanguard Total Bond Market ETF',   sector:'Fixed Income',        group:'Fixed Income',            color:'#64748b', beta:0.98, exp:0.03, corr:{VOLT:0.10,ELFY:0.09,DTCR:0.07,ARTY:0.06,SOXX:0.08,LDRH:0.55,FFNOX:0.30} },
+  AGG:   { name:'iShares Core US Aggregate Bond',   sector:'Fixed Income',        group:'Fixed Income',            color:'#475569', beta:0.99, exp:0.03, corr:{VOLT:0.10,ELFY:0.09,DTCR:0.07,ARTY:0.06,SOXX:0.08,LDRH:0.45,FFNOX:0.30} },
+  // Defensive / Commodities
+  XLP:   { name:'Consumer Staples Select SPDR',     sector:'Consumer Staples',    group:'Defensive & Commodities', color:'#10b981', beta:0.58, exp:0.08, corr:{VOLT:0.12,ELFY:0.11,DTCR:0.15,ARTY:0.12,SOXX:0.14,LDRH:0.20,FFNOX:0.40} },
+  XLE:   { name:'Energy Select Sector SPDR',        sector:'Traditional Energy',  group:'Defensive & Commodities', color:'#fb923c', beta:1.00, exp:0.08, corr:{VOLT:0.25,ELFY:0.24,DTCR:0.15,ARTY:0.14,SOXX:0.18,LDRH:0.10,FFNOX:0.40} },
+  GLDM:  { name:'SPDR Gold MiniShares',             sector:'Commodities / Gold',  group:'Defensive & Commodities', color:'#fbbf24', beta:0.16, exp:0.10, corr:{VOLT:0.08,ELFY:0.07,DTCR:0.05,ARTY:0.04,SOXX:0.05,LDRH:0.12,FFNOX:0.15} },
+};
+
+// Correlation lookup extended to cover simulated tickers (falls back to
+// CORR_TABLE for real holdings, SIM_LIBRARY.corr for hypothetical ones).
+function corrValExtended(a, b) {
+  if (a === b) return 1;
+  const direct = corrVal(a, b);
+  if (direct !== null) return direct;
+  if (SIM_LIBRARY[a] && SIM_LIBRARY[a].corr[b] !== undefined) return SIM_LIBRARY[a].corr[b];
+  if (SIM_LIBRARY[b] && SIM_LIBRARY[b].corr[a] !== undefined) return SIM_LIBRARY[b].corr[a];
+  if (SIM_LIBRARY[a] && SIM_LIBRARY[b]) return 0.30; // two simulated tickers, no direct estimate
+  return null;
+}
+
+function openSimulator() {
+  const sel = document.getElementById('simTickerSelect');
+  const groups = {};
+  Object.entries(SIM_LIBRARY).forEach(([sym, d]) => (groups[d.group] = groups[d.group] || []).push([sym, d]));
+  sel.innerHTML = Object.entries(groups).map(([group, items]) =>
+    `<optgroup label="${group}">${items.map(([sym, d]) =>
+      `<option value="${sym}">${sym} — ${d.name} (β ${d.beta.toFixed(2)})</option>`).join('')}</optgroup>`
+  ).join('');
+  simViewMode = 'live';
+  renderSimulator();
+  document.getElementById('simOverlay').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+
+function closeSimulator() {
+  document.getElementById('simOverlay').classList.remove('open');
+  document.body.style.overflow = '';
+}
+
+/* ── Per-account capital cap (cumulative, derived from real account values) ── */
+function acctRealTotal(acct) {
+  return DATA[acct].holdings.reduce((s, h) => s + livePrice(h) * h.qty, 0);
+}
+function acctSimTotal(acct) {
+  return simPositions.filter(p => p.acct === acct).reduce((s, p) => s + p.amount, 0);
+}
+function acctAvailable(acct) {
+  return Math.max(0, acctRealTotal(acct) - acctSimTotal(acct));
+}
+
+function addSimPosition() {
+  const sym    = document.getElementById('simTickerSelect').value;
+  const acct   = document.getElementById('simAccountSelect').value;
+  const amtEl  = document.getElementById('simAmount');
+  let amount   = parseFloat(amtEl.value);
+  if (!sym || isNaN(amount) || amount <= 0) return;
+  const available = acctAvailable(acct);
+  if (amount > available) amount = available;
+  if (amount <= 0) { amtEl.value = ''; return; }
+  simPositions.push({ sym, amount, acct });
+  amtEl.value = '';
+  renderSimulator();
+}
+
+function removeSimPosition(idx) {
+  simPositions.splice(idx, 1);
+  renderSimulator();
+}
+
+function resetSimulator() {
+  simPositions = [];
+  renderSimulator();
+}
+
+// Live-editable amount: update analytics on every keystroke without
+// rebuilding the position list (which would steal input focus).
+function onSimAmountInput(idx, value) {
+  const amount = parseFloat(value);
+  simPositions[idx].amount = isNaN(amount) || amount < 0 ? 0 : amount;
+  renderSimAnalytics();
+}
+function onSimAmountBlur(idx, inputEl) {
+  const p = simPositions[idx];
+  const otherTotal = acctSimTotal(p.acct) - p.amount;
+  const maxAllowed = Math.max(0, acctRealTotal(p.acct) - otherTotal);
+  if (p.amount > maxAllowed) p.amount = maxAllowed;
+  inputEl.value = p.amount.toFixed(2);
+  renderSimAnalytics();
+}
+
+function avgPortfolioCorr(syms) {
+  let total = 0, count = 0;
+  for (let i = 0; i < syms.length; i++) {
+    for (let j = i + 1; j < syms.length; j++) {
+      const r = corrValExtended(syms[i], syms[j]);
+      if (r !== null) { total += r; count++; }
+    }
+  }
+  return count ? total / count : 0;
+}
+
+function betaOf(sym) {
+  if (SIM_LIBRARY[sym]) return SIM_LIBRARY[sym].beta;
+  const h = allAcctHoldings().find(h => h.sym === sym);
+  return h ? h.beta : null;
+}
+
+/* ── Saved portfolios (max 2, browser localStorage) ── */
+function getSimSlot(slot) {
+  const raw = localStorage.getItem('simPortfolio' + slot);
+  return raw ? JSON.parse(raw) : null;
+}
+function saveSimSlot(slot) {
+  const payload = {
+    positions: simPositions.map(p => ({ ...p })),
+    savedAt: new Date().toISOString(),
+    total: simPositions.reduce((s, p) => s + p.amount, 0)
+  };
+  localStorage.setItem('simPortfolio' + slot, JSON.stringify(payload));
+  renderSimSaveSlots();
+}
+function loadSimSlot(slot) {
+  const data = getSimSlot(slot);
+  if (!data) return;
+  simPositions = data.positions.map(p => ({ ...p }));
+  simViewMode = 'live';
+  renderSimulator();
+}
+function clearSimSlot(slot) {
+  localStorage.removeItem('simPortfolio' + slot);
+  renderSimSaveSlots();
+}
+function renderSimSaveSlots() {
+  const a = getSimSlot('A'), b = getSimSlot('B');
+  document.getElementById('simSaveSlots').innerHTML = ['A', 'B'].map(slot => {
+    const data = slot === 'A' ? a : b;
+    if (!data) {
+      return `<div class="sim-save-card sim-save-empty">
+        <span>Portfolio ${slot}: empty</span>
+        <button class="sim-add-btn" onclick="saveSimSlot('${slot}')">Save Current Here</button>
+      </div>`;
+    }
+    const t = new Date(data.savedAt);
+    return `<div class="sim-save-card">
+      <span><b>Portfolio ${slot}</b> · $${data.total.toFixed(2)} · ${data.positions.length} position(s) · saved ${t.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}</span>
+      <span style="display:flex;gap:6px;flex-wrap:wrap">
+        <button class="sim-add-btn" onclick="loadSimSlot('${slot}')">Load</button>
+        <button class="sim-add-btn" style="background:rgba(255,255,255,.08);color:var(--txt2)" onclick="saveSimSlot('${slot}')">Overwrite</button>
+        <button class="sim-add-btn" style="background:rgba(239,68,68,.12);color:var(--red)" onclick="clearSimSlot('${slot}')">Clear</button>
+      </span>
+    </div>`;
+  }).join('');
+  document.getElementById('simCombineBtn').style.display = (a && b) ? 'inline-block' : 'none';
+}
+
+function viewCombinedSim() {
+  simViewMode = 'combined';
+  renderSimulator();
+}
+function exitCombinedView() {
+  simViewMode = 'live';
+  renderSimulator();
+}
+function activeSimPositions() {
+  if (simViewMode === 'combined') {
+    const a = getSimSlot('A'), b = getSimSlot('B');
+    return [...(a ? a.positions : []), ...(b ? b.positions : [])];
+  }
+  return simPositions;
+}
+
+function renderSimCapRow() {
+  document.getElementById('simCapRow').innerHTML = ['individual', 'roth'].map(acct => {
+    const total = acctRealTotal(acct);
+    const used  = acctSimTotal(acct);
+    const avail = Math.max(0, total - used);
+    const pct   = total > 0 ? Math.min(100, (used / total) * 100) : 0;
+    return `<div class="sim-cap-card">
+      <div class="sim-cap-label">${DATA[acct].label}</div>
+      <div class="sim-cap-val">$${avail.toFixed(2)} <span style="font-size:11px;color:var(--txt3);font-weight:400">available of $${total.toFixed(2)}</span></div>
+      <div class="sim-cap-bar-track"><div class="sim-cap-bar-fill" style="width:${pct}%"></div></div>
+    </div>`;
+  }).join('');
+}
+
+function renderSimulator() {
+  document.getElementById('simLiveControls').style.display    = simViewMode === 'combined' ? 'none' : '';
+  document.getElementById('simCombinedBanner').style.display  = simViewMode === 'combined' ? '' : 'none';
+  renderSimPositionList();
+  renderSimAnalytics();
+  renderSimSaveSlots();
+}
+
+function renderSimPositionList() {
+  document.getElementById('simPositionList').innerHTML = simPositions.length === 0
+    ? `<div style="color:var(--txt3);font-size:12px">No hypothetical positions added yet — pick an ETF above and enter a dollar amount.</div>`
+    : simPositions.map((p, i) => {
+        const d = SIM_LIBRARY[p.sym];
+        return `<div class="sim-position-row">
+          <div><span class="sym">${p.sym}</span> <span style="color:var(--txt3);font-size:11px">${d.sector} · β ${d.beta.toFixed(2)} · ${d.exp}% exp ratio · ${DATA[p.acct].label}</span></div>
+          <div style="display:flex;align-items:center;gap:8px">
+            <span style="color:var(--txt3);font-size:12px">$</span>
+            <input class="sim-amount-input" type="number" min="0" step="1" value="${p.amount.toFixed(2)}"
+              oninput="onSimAmountInput(${i}, this.value)" onblur="onSimAmountBlur(${i}, this)">
+            <button class="sim-position-remove" onclick="removeSimPosition(${i})">✕</button>
+          </div>
+        </div>`;
+      }).join('');
+}
+
+function renderSimAnalytics() {
+  const working   = activeSimPositions();
+  const real      = allAcctHoldings().map(h => ({ sym: h.sym, sector: h.sector, color: h.color, value: livePrice(h) * h.qty, beta: h.beta }));
+  const realTotal = real.reduce((s, h) => s + h.value, 0);
+  const simTotal  = working.reduce((s, p) => s + p.amount, 0);
+  const newTotal  = realTotal + simTotal;
+
+  if (simViewMode === 'live') renderSimCapRow();
+  else document.getElementById('simCapRow').innerHTML = '';
+
+  // — Sector breakdown before/after —
+  const sectorsBefore = new Set(real.map(h => h.sector)).size;
+  const sectorMapAfter = {};
+  real.forEach(h => sectorMapAfter[h.sector] = (sectorMapAfter[h.sector] || 0) + h.value);
+  working.forEach(p => {
+    const sec = SIM_LIBRARY[p.sym].sector;
+    sectorMapAfter[sec] = (sectorMapAfter[sec] || 0) + p.amount;
+  });
+  const sectorsAfter = Object.keys(sectorMapAfter).length;
+
+  // — Correlation score before/after —
+  const symsBefore = [...new Set(real.map(h => h.sym))];
+  const symsAfter  = [...new Set([...symsBefore, ...working.map(p => p.sym)])];
+  const corrBefore = avgPortfolioCorr(symsBefore);
+  const corrAfter  = avgPortfolioCorr(symsAfter);
+
+  document.getElementById('simMetrics').innerHTML = `
+    <div class="sim-metric-card">
+      <div class="sim-metric-label">Simulated Total Value</div>
+      <div class="sim-metric-val">$${newTotal.toFixed(2)}</div>
+      <div class="sim-metric-delta" style="color:${simTotal > 0 ? 'var(--green)' : 'var(--txt3)'}">${simTotal > 0 ? '+$' + simTotal.toFixed(2) + ' hypothetical' : 'Current portfolio (no changes)'}</div>
+    </div>
+    <div class="sim-metric-card">
+      <div class="sim-metric-label">Sectors Covered</div>
+      <div class="sim-metric-val">${sectorsAfter}</div>
+      <div class="sim-metric-delta" style="color:${sectorsAfter > sectorsBefore ? 'var(--green)' : 'var(--txt3)'}">${sectorsAfter > sectorsBefore ? '+' + (sectorsAfter - sectorsBefore) + ' new vs current (' + sectorsBefore + ')' : 'No new sectors yet'}</div>
+    </div>
+    <div class="sim-metric-card">
+      <div class="sim-metric-label">Avg. Portfolio Correlation</div>
+      <div class="sim-metric-val">${corrAfter.toFixed(2)}</div>
+      <div class="sim-metric-delta" style="color:${working.length === 0 ? 'var(--txt3)' : (corrAfter < corrBefore ? 'var(--green)' : 'var(--red)')}">${working.length === 0 ? 'Baseline — lower is more diversified' : (corrAfter < corrBefore ? '↓ from ' + corrBefore.toFixed(2) + ' — more diversified' : '↑ from ' + corrBefore.toFixed(2) + ' — more concentrated')}</div>
+    </div>
+  `;
+
+  // — Sector allocation chart —
+  const labels = Object.keys(sectorMapAfter);
+  const data   = Object.values(sectorMapAfter);
+  const colors = labels.map(l => {
+    const realMatch = real.find(h => h.sector === l);
+    if (realMatch) return realMatch.color;
+    const simSym = working.find(p => SIM_LIBRARY[p.sym].sector === l);
+    return simSym ? SIM_LIBRARY[simSym.sym].color : '#64748b';
+  });
+  if (simChart) simChart.destroy();
+  simChart = new Chart(document.getElementById('simChart'), {
+    type: 'doughnut',
+    data: { labels, datasets: [{ data, backgroundColor: colors, borderWidth: 0 }] },
+    options: { plugins: { legend: { position: 'bottom', labels: { color: '#94a3b8', font: { size: 10 }, boxWidth: 10 } } }, cutout: '60%' }
+  });
+
+  // — Correlation preview table for newly added tickers —
+  const el = document.getElementById('simCorrPreview');
+  if (working.length === 0) {
+    el.innerHTML = 'Add a position above to see correlation.';
+  } else {
+    const uniqueSimSyms = [...new Set(working.map(p => p.sym))];
+    el.innerHTML = `<table class="sim-corr-table">
+      <thead><tr><td></td>${symsBefore.map(s => `<td>${s}</td>`).join('')}</tr></thead>
+      <tbody>${uniqueSimSyms.map(sym => `<tr><td>${sym}</td>${symsBefore.map(s => {
+        const r = corrValExtended(sym, s);
+        const { bg, fg } = corrColor(r ?? 0.3);
+        return `<td style="background:${bg};color:${fg};border-radius:4px">${r !== null ? r.toFixed(2) : '—'}</td>`;
+      }).join('')}</tr>`).join('')}</tbody>
+    </table>`;
+  }
+}
+
+/* ── Click-chart detail popup ── */
+function openSimDetail() {
+  renderSimDetail();
+  document.getElementById('simDetailOverlay').classList.add('open');
+}
+function closeSimDetail() {
+  document.getElementById('simDetailOverlay').classList.remove('open');
+}
+function renderSimDetail() {
+  const working    = activeSimPositions();
+  const real       = allAcctHoldings().map(h => ({ sym: h.sym, sector: h.sector, value: livePrice(h) * h.qty, beta: h.beta }));
+  const realTotal  = real.reduce((s, h) => s + h.value, 0);
+  const simTotal   = working.reduce((s, p) => s + p.amount, 0);
+  const grandTotal = realTotal + simTotal;
+
+  const sectorMap = {};
+  real.forEach(h => sectorMap[h.sector] = (sectorMap[h.sector] || 0) + h.value);
+  working.forEach(p => {
+    const sec = SIM_LIBRARY[p.sym].sector;
+    sectorMap[sec] = (sectorMap[sec] || 0) + p.amount;
+  });
+  document.getElementById('simDetailSectorBody').innerHTML = Object.entries(sectorMap)
+    .sort((a, b) => b[1] - a[1])
+    .map(([sec, val]) => `<tr><td>${sec}</td><td>$${val.toFixed(2)}</td><td>${grandTotal > 0 ? (val / grandTotal * 100).toFixed(1) : '0.0'}%</td></tr>`)
+    .join('');
+
+  let betaSum = 0, betaWeight = 0;
+  real.forEach(h => { if (h.beta != null) { betaSum += h.value * h.beta; betaWeight += h.value; } });
+  working.forEach(p => { const b = betaOf(p.sym); if (b != null) { betaSum += p.amount * b; betaWeight += p.amount; } });
+  const portBeta  = betaWeight > 0 ? betaSum / betaWeight : null;
+  const riskLabel = portBeta === null ? 'Unknown' : portBeta >= 1.3 ? 'High' : portBeta >= 0.9 ? 'Moderate-High' : portBeta >= 0.6 ? 'Moderate' : 'Low';
+  document.getElementById('simDetailRisk').innerHTML = `
+    <div class="sim-metric-card" style="max-width:300px">
+      <div class="sim-metric-label">Weighted Portfolio Beta</div>
+      <div class="sim-metric-val">${portBeta !== null ? portBeta.toFixed(2) : '—'}</div>
+      <div class="sim-metric-delta" style="color:var(--txt2)">${riskLabel} volatility vs S&P 500 (1.00) — weighted by each holding's actual beta</div>
+    </div>`;
+
+  const syms = [...new Set([...real.map(h => h.sym), ...working.map(p => p.sym)])];
+  const colDef = `60px repeat(${syms.length}, 1fr)`;
+  let gridHTML = `<div style="grid-column:1/-1;display:grid;grid-template-columns:${colDef};gap:3px">`;
+  gridHTML += `<div></div>` + syms.map(s => `<div class="corr-head">${s}</div>`).join('');
+  syms.forEach(rowSym => {
+    gridHTML += `<div class="corr-row-label">${rowSym}</div>`;
+    syms.forEach(colSym => {
+      if (rowSym === colSym) { gridHTML += `<div class="corr-cell" style="background:var(--border);color:var(--txt3)">—</div>`; return; }
+      const r = corrValExtended(rowSym, colSym);
+      const { bg, fg } = corrColor(r ?? 0.3);
+      gridHTML += `<div class="corr-cell" style="background:${bg};color:${fg}">${r !== null ? r.toFixed(2) : '—'}</div>`;
+    });
+  });
+  gridHTML += `</div>`;
+  document.getElementById('simDetailCorrGrid').innerHTML = gridHTML;
+}
+
+document.addEventListener('click', e => {
+  if (e.target.id === 'simOverlay') closeSimulator();
+  if (e.target.id === 'simDetailOverlay') closeSimDetail();
+});
+
+function openAudit() {
+  const H = allAcctHoldings();
+
+  // — Section 1: Scorecard —
+  const scored = H.map(h => {
+    const ret    = ((livePrice(h) * h.qty - h.cost) / h.cost) * 100;
+    const bmQ    = quotes[h.bm];
+    const bmRet  = bmQ ? bmQ.changePct : null;
+    const diff   = bmRet !== null ? ret - bmRet : null;
+
+    let statusCls, statusLabel;
+    if      (ret >= 10)  { statusCls = 'status-out'; statusLabel = 'Outperforming'; }
+    else if (ret >= 0)   { statusCls = 'status-ok';  statusLabel = 'On Track'; }
+    else if (ret >= -1)  { statusCls = 'status-mon'; statusLabel = 'Monitor'; }
+    else                 { statusCls = 'status-lag'; statusLabel = 'Underperforming'; }
+
+    return { ...h, ret, diff, statusCls, statusLabel };
+  }).sort((a, b) => a.ret - b.ret);
+
+  document.getElementById('auditScorecard').innerHTML = scored.map(s => `
+    <tr>
+      <td><span class="sym">${s.sym}</span></td>
+      <td style="color:var(--txt3);font-size:11px">${s.acct}</td>
+      <td><span class="stag" style="background:${s.color}1a;color:${s.color}">${s.sector}</span></td>
+      <td class="${clr(s.ret)}" style="font-weight:600">${fmtPct(s.ret)}</td>
+      <td style="color:var(--txt3);font-size:11px">${s.diff !== null ? (s.diff >= 0 ? '+' : '') + s.diff.toFixed(1) + '% vs ' + s.bmName : '—'}</td>
+      <td><span class="status-badge ${s.statusCls}">${s.statusLabel}</span></td>
+    </tr>
+  `).join('');
+
+  // — Section 2: Gap Map —
+  const sectorItems = MARKET_MAP.filter(m => !m.geo);
+  const geoItems    = MARKET_MAP.filter(m =>  m.geo);
+
+  function gapHTML(items) {
+    return items.map(m => {
+      const cls  = m.status === 'covered' ? 'gap-covered' : m.status === 'partial' ? 'gap-partial' : 'gap-missing';
+      const dotC = m.status === 'covered' ? '#10b981'     : m.status === 'partial' ? '#f59e0b'    : '#ef4444';
+      return `<div class="gap-item ${cls}">
+        <div class="gap-name"><span class="gap-dot" style="background:${dotC}"></span>${m.name}</div>
+        <div class="gap-note">${m.note}</div>
+      </div>`;
+    }).join('');
+  }
+
+  document.getElementById('auditGapGrid').innerHTML =
+    `<div style="grid-column:1/-1;font-size:11px;color:var(--txt3);margin-bottom:4px;font-weight:600;text-transform:uppercase;letter-spacing:.5px">By Sector</div>` +
+    gapHTML(sectorItems) +
+    `<div style="grid-column:1/-1;font-size:11px;color:var(--txt3);margin-top:8px;margin-bottom:4px;font-weight:600;text-transform:uppercase;letter-spacing:.5px">By Geography & Cap</div>` +
+    gapHTML(geoItems);
+
+  // — Section 3: Adjustments —
+  document.getElementById('auditAdjCards').innerHTML = ADJUSTMENTS.map((a, i) => `
+    <div class="adj-card">
+      <div class="adj-num">${i + 1}</div>
+      <div>
+        <div class="adj-title">${a.title}</div>
+        <span class="adj-action adj-${a.action}">${a.label}</span>
+        <div class="adj-body">${a.body}</div>
+      </div>
+    </div>
+  `).join('');
+
+  // — Section 4a: Correlation matrix —
+  const n = CORR_SYMS.length;
+  const colDef = `60px repeat(${n}, 1fr)`;
+  let gridHTML = `<div style="grid-column:1/-1;display:grid;grid-template-columns:${colDef};gap:3px">`;
+  // header row
+  gridHTML += `<div></div>` + CORR_SYMS.map(s => `<div class="corr-head">${s}</div>`).join('');
+  // data rows
+  CORR_SYMS.forEach(rowSym => {
+    gridHTML += `<div class="corr-row-label">${rowSym}</div>`;
+    CORR_SYMS.forEach(colSym => {
+      const r = corrVal(rowSym, colSym);
+      if (rowSym === colSym) {
+        gridHTML += `<div class="corr-cell" style="background:var(--border);color:var(--txt3)">—</div>`;
+      } else {
+        const { bg, fg } = corrColor(r);
+        gridHTML += `<div class="corr-cell" style="background:${bg};color:${fg}" title="${rowSym} vs ${colSym}: ${r.toFixed(2)}">${r.toFixed(2)}</div>`;
+      }
+    });
+  });
+  gridHTML += `</div>`;
+  document.getElementById('auditCorrGrid').innerHTML = gridHTML;
+
+  // — Section 4b: Health rules —
+  document.getElementById('auditHealthList').innerHTML = HEALTH_RULES.map(r => {
+    const icon  = r.status === 'pass' ? '✅' : r.status === 'warn' ? '⚠️' : '❌';
+    const cls   = r.status === 'pass' ? 'h-pass' : r.status === 'warn' ? 'h-warn' : 'h-fail';
+    return `<div class="health-item ${cls}">
+      <div class="health-icon">${icon}</div>
+      <div>
+        <div class="health-title">${r.title}</div>
+        <div class="health-desc">${r.desc}</div>
+      </div>
+    </div>`;
+  }).join('');
+
+  // Date stamp
+  const t = new Date();
+  document.getElementById('auditDate').textContent =
+    `Generated ${t.toLocaleDateString('en-US',{month:'long',day:'numeric',year:'numeric'})} · Combined portfolio analysis`;
+
+  document.getElementById('auditOverlay').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+
+function closeAudit() {
+  document.getElementById('auditOverlay').classList.remove('open');
+  document.body.style.overflow = '';
+}
+
+// Close if user clicks outside the modal
+document.addEventListener('click', e => {
+  const overlay = document.getElementById('auditOverlay');
+  if (e.target === overlay) closeAudit();
+});
+
+/* ══════════════════════════════════════════════════
+   BOOT
+══════════════════════════════════════════════════ */
+loadAll();
+</script>
+</body>
+</html>
