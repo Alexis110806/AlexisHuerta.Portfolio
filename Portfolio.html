@@ -1220,22 +1220,22 @@ const MARKET_MAP = [
 // Three specific adjustments (Claude-authored, based on audit)
 const ADJUSTMENTS = [
   {
-    title:   'Consolidate Electrification → Add Healthcare',
-    action:  'sell',
-    label:   'SELL VOLT · BUY XLV',
-    body:    `VOLT and ELFY are highly correlated — both track electrification themes, both are down, and together they consume 50% of your Individual Brokerage. That's a concentrated bet in one sub-theme. Sell VOLT (down -0.73%, marginally worse than ELFY), take the ~$25, and buy <span class="adj-ticker">XLV</span> (Health Care Select Sector ETF). Healthcare is the single largest gap in your portfolio — 0% exposure vs 11% of the S&P 500. It's defensive (outperforms in recessions) AND has 50-year innovation tailwinds (genomics, biotech, AI diagnostics).`
-  },
-  {
-    title:   'Add Emerging Markets to Roth IRA',
+    title:   'Add International Developed Markets',
     action:  'buy',
-    label:   'BUY VWO or IEMG',
-    body:    `Your Roth IRA is essentially US-only: FFNOX is US-heavy, SOXX tracks US-listed semis, LDRH is a US bond ladder. Over a 15–50 year horizon, emerging economies (India, SE Asia, Brazil) will be a significantly larger share of global GDP. Buy <span class="adj-ticker">VWO</span> (Vanguard Emerging Markets ETF, 0.08% expense ratio — among the cheapest available) or <span class="adj-ticker">IEMG</span> in your Roth IRA. The tax-sheltered account is the ideal home for this long-term, higher-growth allocation.`
+    label:   'BUY VEA in Roth IRA',
+    body:    `You have Emerging Markets (VWO) but zero International Developed exposure — Europe, Japan, UK, Canada, and Australia together represent ~40% of global investable market cap. Over a 15–50 year horizon that's a significant gap. Buy <span class="adj-ticker">VEA</span> (Vanguard FTSE Developed Markets ETF, 0.03% expense ratio) in your Roth IRA. It pairs naturally alongside your VWO and FFNOX and completes your global diversification picture.`
   },
   {
-    title:   'Investigate ARTY — Consider Swapping for QQQ',
+    title:   'Add Dividend Compounder to Roth IRA',
+    action:  'buy',
+    label:   'BUY SCHD in Roth IRA',
+    body:    `Your Roth IRA has growth (SOXX, FFNOX) and defense (VHT, LDRH, GLDM, AGG) but no dividend-compounding engine. <span class="adj-ticker">SCHD</span> (Schwab US Dividend Equity ETF, 0.06% expense ratio) has outperformed SPY over 10 years with lower volatility, and its dividends reinvest tax-free inside a Roth. Its Value tilt also counterbalances the QQQ/DTCR/SOXX growth cluster in your brokerage — giving you a more balanced factor exposure overall.`
+  },
+  {
+    title:   'Review LDRH + AGG Overlap in Roth IRA',
     action:  'swap',
-    label:   'REVIEW ARTY vs QQQ',
-    body:    `ARTY (iShares Future AI & Tech ETF) is your worst performer at -1.84% while the broader AI/tech sector has been strongly positive in 2025–2026. Before adding to this position, compare ARTY's top 10 holdings against <span class="adj-ticker">QQQ</span> (NASDAQ 100) or <span class="adj-ticker">VGT</span> (Vanguard Information Technology). If ARTY lacks sufficient weight in Nvidia, Microsoft, Meta, and Alphabet — the companies driving actual AI returns — it's the wrong vehicle for this thesis. Share the ARTY Morningstar PDF with Claude for a specific comparison.`
+    label:   'CONSOLIDATE Fixed Income',
+    body:    `LDRH (short-term high-yield bonds) and AGG (broad investment-grade bonds) both occupy fixed income in your Roth IRA with an estimated correlation of ~0.82. Owning both spreads ~$60 across two overlapping bond ETFs. Consider consolidating into one — keep AGG (broader, lower risk) and redirect LDRH's ~$25 toward VEA or SCHD for better diversification bang per dollar. Or keep both if you want the short-duration / high-yield tilt LDRH specifically provides.`
   }
 ];
 
