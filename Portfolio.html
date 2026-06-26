@@ -797,7 +797,7 @@
 
 <footer class="footer">
   Data provided by Google Sheets (GOOGLEFINANCE) & Alpha Vantage · For personal informational use only — not financial advice.<br>
-  Portfolio as of Jun 25 2026 · Dashboard built with Claude Code
+  Portfolio as of Jun 11 2026 · Dashboard built with Claude Code
 </footer>
 
 <script>
@@ -817,22 +817,19 @@ const DATA = {
     label: 'Individual Brokerage',
     risk:  'Aggressive Growth',
     holdings: [
-      { sym:'VOLT',  name:'TEMA Electrification ETF',        qty:0.649, cost:24.98,  sector:'Clean Energy',    color:'#10b981', bm:'SPY',  bmName:'S&P 500',        beta:1.30 },
-      { sym:'VWO',   name:'Vanguard FTSE Emerging Markets',  qty:0.439, cost:26.94,  sector:'Emerging Markets',color:'#eab308', bm:'EEM',  bmName:'MSCI EM',        beta:0.78 },
-      { sym:'QQQ',   name:'Invesco QQQ Trust',               qty:0.037, cost:27.48,  sector:'Large-Cap Growth',color:'#4f46e5', bm:'QQQ',  bmName:'NASDAQ 100',     beta:1.23 },
-      { sym:'DTCR',  name:'Global X Data Center & Digital',  qty:0.813, cost:25.00,  sector:'Data Centers',    color:'#06b6d4', bm:'QQQ',  bmName:'NASDAQ 100',     beta:1.45 },
+      { sym:'VOLT',  name:'TEMA Electrification ETF',        qty:0.649, cost:24.98,  sector:'Clean Energy',   color:'#10b981', bm:'SPY',  bmName:'S&P 500',       beta:1.30 },
+      { sym:'ELFY',  name:'ALPS Electrification ETF',        qty:0.582, cost:24.99,  sector:'Clean Energy',   color:'#10b981', bm:'SPY',  bmName:'S&P 500',       beta:1.30 },
+      { sym:'DTCR',  name:'Global X Data Center & Digital',  qty:0.813, cost:25.00,  sector:'Data Centers',   color:'#06b6d4', bm:'QQQ',  bmName:'NASDAQ 100',    beta:1.45 },
+      { sym:'ARTY',  name:'iShares Future AI & Tech ETF',    qty:0.351, cost:24.94,  sector:'AI & Tech',      color:'#8b5cf6', bm:'QQQ',  bmName:'NASDAQ 100',    beta:2.05 },
     ]
   },
   roth: {
     label: 'Roth IRA',
-    risk:  'Diversified Growth',
+    risk:  'Conservative Growth',
     holdings: [
-      { sym:'VHT',   name:'Vanguard Health Care ETF',        qty:0.084,  cost:24.74,  sector:'Healthcare',      color:'#f472b6', bm:'SPY',  bmName:'S&P 500',        beta:0.62 },
-      { sym:'SOXX',  name:'iShares Semiconductor ETF',       qty:0.072,  cost:24.74,  sector:'Semiconductors',  color:'#f59e0b', bm:'SOXX', bmName:'PHLX Semi',      beta:2.26 },
-      { sym:'LDRH',  name:'iBonds 1-5yr High Yield Ladder',  qty:1.025,  cost:24.99,  sector:'Fixed Income',    color:'#64748b', bm:'BND',  bmName:'Total Bond Mkt', beta:0.15 },
-      { sym:'GLDM',  name:'SPDR Gold MiniShares',            qty:0.375,  cost:29.98,  sector:'Commodities',     color:'#fbbf24', bm:'GLD',  bmName:'Gold Spot',      beta:0.16 },
-      { sym:'FFNOX', name:'Fidelity Multi-Asset Index Fund', qty:1.701,  cost:116.23, sector:'Multi-Asset',     color:'#2563eb', bm:'SPY',  bmName:'S&P 500',        beta:1.19 },
-      { sym:'AGG',   name:'iShares Core US Aggregate Bond',  qty:0.352,  cost:34.96,  sector:'Fixed Income',    color:'#475569', bm:'BND',  bmName:'Total Bond Mkt', beta:0.99 },
+      { sym:'SOXX',  name:'iShares Semiconductor ETF',        qty:0.072,  cost:24.74,  sector:'Semiconductors', color:'#f59e0b', bm:'SOXX', bmName:'PHLX Semi',     beta:2.26 },
+      { sym:'LDRH',  name:'iBonds 1-5yr High Yield Ladder',   qty:1.025,  cost:24.99,  sector:'Fixed Income',   color:'#64748b', bm:'BND',  bmName:'Total Bond Mkt', beta:0.15 },
+      { sym:'FFNOX', name:'Fidelity Multi-Asset Index Fund',  qty:2.919,  cost:200.00, sector:'Multi-Asset',    color:'#2563eb', bm:'SPY',  bmName:'S&P 500',       beta:1.19 },
     ]
   }
 };
@@ -843,34 +840,34 @@ const DATA = {
 ══════════════════════════════════════════════════ */
 const RECS = [
   {
-    sector:  'International Developed Markets',
-    tickers: 'VEA · VXUS · EFA',
+    sector:  'Healthcare / Biotech',
+    tickers: 'XLV · IBB · ARKG',
     badge:   'Gap',
-    note:    'You own Emerging Markets (VWO) but zero International Developed — Europe, Japan, UK, Canada represent ~40% of global market cap. VEA (0.03% expense ratio) is the cheapest entry and pairs naturally with your existing VWO.'
+    note:    'Zero healthcare exposure across both accounts. A 15–50 yr horizon makes biotech innovation a strong thematic fit. XLV (broad, low-risk) for Roth; ARKG (high-conviction growth) for Brokerage.'
   },
   {
-    sector:  'Mid-Cap / Small-Cap',
-    tickers: 'VO · VBK · IJR',
+    sector:  'Dividend Income',
+    tickers: 'SCHD · VIG · DVY',
     badge:   'Gap',
-    note:    'Small-caps have historically outperformed large-caps by ~1–2%/yr over long horizons. Every equity position targets large-cap only. VO (Mid-Cap, beta 0.99) is the lowest-risk entry; VBK (Small-Cap Growth) fits your existing growth tilt.'
+    note:    'Your Roth IRA is tax-sheltered — ideal for dividend compounding tax-free. SCHD has outperformed SPY over 10 yrs with lower drawdowns.'
   },
   {
-    sector:  'Dividend / Value',
-    tickers: 'SCHD · VTV · VIG',
-    badge:   'Opportunity',
-    note:    'Your Roth IRA is ideal for dividend compounding — dividends reinvest tax-free. SCHD has outperformed SPY over 10 years with lower volatility, and its Value tilt counterbalances your QQQ/SOXX growth cluster.'
+    sector:  'International / Emerging Markets',
+    tickers: 'VWO · IEMG · EEM',
+    badge:   'Gap',
+    note:    'FFNOX has some int\'l exposure but is U.S.-heavy. A dedicated EM position diversifies geopolitical risk across your long horizon.'
   },
   {
-    sector:  'Traditional Energy',
-    tickers: 'XLE · VDE · MLPA',
+    sector:  'Energy / Infrastructure',
+    tickers: 'XLE · ICLN · MLPA',
     badge:   'Partial',
-    note:    'VOLT covers clean-energy electrification but misses traditional energy and midstream. XLE acts as an inflation hedge and tends to outperform when rates rise — useful counterweight to your tech-heavy brokerage.'
+    note:    'VOLT & ELFY cover clean-energy electrification but miss traditional energy & midstream. XLE acts as inflation hedge; ICLN extends your clean-energy thesis.'
   },
   {
     sector:  'Consumer Staples',
     tickers: 'XLP · VDC',
     badge:   'Defensive',
-    note:    'Adds recession resistance across your 50-year horizon. Consumer Staples outperform in downturns and have near-zero correlation with your tech cluster — useful as portfolio protection during market cycles.'
+    note:    'Adds recession resistance to balance your growth-heavy brokerage. Staples outperform in downturns — useful anchor over a multi-decade hold.'
   }
 ];
 
@@ -1202,61 +1199,58 @@ function renderRecs() {
 
 // Market coverage map — all major GICS sectors + geographies
 const MARKET_MAP = [
-  { name:'Clean Energy / Electrification', status:'covered',  note:'VOLT',                        geo:false },
-  { name:'Data Centers / Digital Infra',   status:'covered',  note:'DTCR',                        geo:false },
-  { name:'Large-Cap Growth / Tech',        status:'covered',  note:'QQQ',                         geo:false },
-  { name:'Semiconductors',                 status:'covered',  note:'SOXX',                        geo:false },
-  { name:'Healthcare / Biotech',           status:'covered',  note:'VHT',                         geo:false },
-  { name:'Fixed Income / Bonds',           status:'covered',  note:'LDRH + AGG',                  geo:false },
-  { name:'Multi-Asset (Broad Market)',     status:'covered',  note:'FFNOX',                       geo:false },
-  { name:'Commodities / Gold',             status:'covered',  note:'GLDM',                        geo:false },
-  { name:'Financials / Banking',           status:'missing',  note:'0% — 13% of S&P',             geo:false },
-  { name:'Consumer Discretionary',         status:'missing',  note:'0% — 10% of S&P',             geo:false },
-  { name:'Consumer Staples (Defensive)',   status:'missing',  note:'0% — 6% of S&P',              geo:false },
-  { name:'Industrials',                    status:'missing',  note:'0% — 9% of S&P',              geo:false },
-  { name:'Real Estate / REITs',            status:'missing',  note:'0% — 2.5% of S&P',            geo:false },
-  { name:'Traditional Energy',             status:'missing',  note:'0% (inflation hedge)',         geo:false },
-  { name:'US Large-Cap',                   status:'covered',  note:'QQQ + FFNOX',                 geo:true  },
-  { name:'Emerging Markets',               status:'covered',  note:'VWO (upgraded from partial)', geo:true  },
-  { name:'International Developed',        status:'missing',  note:'Europe, Japan, UK — 0%',      geo:true  },
-  { name:'US Mid-Cap',                     status:'missing',  note:'0% of portfolio',             geo:true  },
-  { name:'US Small-Cap',                   status:'missing',  note:'0% of portfolio',             geo:true  },
+  { name:'Clean Energy / Electrification', status:'covered',  note:'VOLT, ELFY',        geo:false },
+  { name:'Data Centers / Digital Infra',   status:'covered',  note:'DTCR',              geo:false },
+  { name:'AI & Future Technology',         status:'covered',  note:'ARTY',              geo:false },
+  { name:'Semiconductors',                 status:'covered',  note:'SOXX',              geo:false },
+  { name:'Fixed Income / Bonds',           status:'covered',  note:'LDRH',              geo:false },
+  { name:'Multi-Asset (Broad Market)',     status:'covered',  note:'FFNOX',             geo:false },
+  { name:'Healthcare / Biotech',           status:'missing',  note:'0% of portfolio',   geo:false },
+  { name:'Financials / Banking',           status:'missing',  note:'0% — 13% of S&P',  geo:false },
+  { name:'Consumer Discretionary',         status:'missing',  note:'0% — 10% of S&P',  geo:false },
+  { name:'Consumer Staples (Defensive)',   status:'missing',  note:'0% — 6% of S&P',   geo:false },
+  { name:'Industrials',                    status:'missing',  note:'0% — 9% of S&P',   geo:false },
+  { name:'Real Estate / REITs',            status:'missing',  note:'0% — 2.5% of S&P', geo:false },
+  { name:'Materials / Commodities',        status:'missing',  note:'0% of portfolio',   geo:false },
+  { name:'Traditional Energy',             status:'missing',  note:'0% (inflation hdg)',geo:false },
+  { name:'US Large-Cap',                   status:'covered',  note:'Primary exposure',  geo:true  },
+  { name:'International Developed',        status:'missing',  note:'Europe, Japan, UK', geo:true  },
+  { name:'Emerging Markets',               status:'partial',  note:'Minor via FFNOX',   geo:true  },
+  { name:'US Mid-Cap',                     status:'missing',  note:'0% of portfolio',   geo:true  },
+  { name:'US Small-Cap',                   status:'missing',  note:'0% of portfolio',   geo:true  },
 ];
 
 // Three specific adjustments (Claude-authored, based on audit)
 const ADJUSTMENTS = [
   {
-    title:   'Add International Developed Markets',
-    action:  'buy',
-    label:   'BUY VEA or VXUS',
-    body:    `Your portfolio now covers Emerging Markets (VWO) but still has zero exposure to International Developed — Europe, Japan, UK, Canada, and Australia together represent ~40% of global investable market cap. Over a 15–50 year horizon, a dedicated international position is table stakes for genuine global diversification. Buy <span class="adj-ticker">VEA</span> (Vanguard FTSE Developed Markets, 0.03% expense ratio) in your Roth IRA. It pairs naturally with your existing VWO and FFNOX and gives you true global coverage.`
+    title:   'Consolidate Electrification → Add Healthcare',
+    action:  'sell',
+    label:   'SELL VOLT · BUY XLV',
+    body:    `VOLT and ELFY are highly correlated — both track electrification themes, both are down, and together they consume 50% of your Individual Brokerage. That's a concentrated bet in one sub-theme. Sell VOLT (down -0.73%, marginally worse than ELFY), take the ~$25, and buy <span class="adj-ticker">XLV</span> (Health Care Select Sector ETF). Healthcare is the single largest gap in your portfolio — 0% exposure vs 11% of the S&P 500. It's defensive (outperforms in recessions) AND has 50-year innovation tailwinds (genomics, biotech, AI diagnostics).`
   },
   {
-    title:   'Capture the Mid/Small-Cap Premium',
+    title:   'Add Emerging Markets to Roth IRA',
     action:  'buy',
-    label:   'BUY VO or VBK',
-    body:    `Every equity holding in your portfolio targets US large-cap or international companies. Over 15–50 years, small- and mid-cap stocks have historically outperformed large-caps by ~1–2% annually (the "small-cap premium"). At your investment horizon, that gap compounds significantly. Add <span class="adj-ticker">VO</span> (Vanguard Mid-Cap, 0.04% expense ratio, beta 0.99) for a lower-volatility entry, or <span class="adj-ticker">VBK</span> (Vanguard Small-Cap Growth, 0.07%) for a higher-upside fit with your existing growth tilt.`
+    label:   'BUY VWO or IEMG',
+    body:    `Your Roth IRA is essentially US-only: FFNOX is US-heavy, SOXX tracks US-listed semis, LDRH is a US bond ladder. Over a 15–50 year horizon, emerging economies (India, SE Asia, Brazil) will be a significantly larger share of global GDP. Buy <span class="adj-ticker">VWO</span> (Vanguard Emerging Markets ETF, 0.08% expense ratio — among the cheapest available) or <span class="adj-ticker">IEMG</span> in your Roth IRA. The tax-sheltered account is the ideal home for this long-term, higher-growth allocation.`
   },
   {
-    title:   'Add Dividend-Growth Engine to Roth IRA',
-    action:  'buy',
-    label:   'BUY SCHD',
-    body:    `Your Roth IRA has defensive positions (VHT, GLDM, LDRH, AGG) and growth (SOXX, FFNOX) but no dividend-compounding engine. SCHD (Schwab US Dividend Equity ETF, 0.06% expense ratio) has outperformed SPY over 10 years with lower volatility — and dividends reinvest tax-free inside a Roth. With a 15–50 year horizon, reinvested dividends are your most reliable return source. SCHD's Value tilt also counterbalances the QQQ/SOXX/DTCR growth cluster in your brokerage.`
+    title:   'Investigate ARTY — Consider Swapping for QQQ',
+    action:  'swap',
+    label:   'REVIEW ARTY vs QQQ',
+    body:    `ARTY (iShares Future AI & Tech ETF) is your worst performer at -1.84% while the broader AI/tech sector has been strongly positive in 2025–2026. Before adding to this position, compare ARTY's top 10 holdings against <span class="adj-ticker">QQQ</span> (NASDAQ 100) or <span class="adj-ticker">VGT</span> (Vanguard Information Technology). If ARTY lacks sufficient weight in Nvidia, Microsoft, Meta, and Alphabet — the companies driving actual AI returns — it's the wrong vehicle for this thesis. Share the ARTY Morningstar PDF with Claude for a specific comparison.`
   }
 ];
 
 // Pairwise correlation estimates (based on sector overlap & underlying holdings)
-const CORR_SYMS  = ['VOLT','VWO','QQQ','DTCR','VHT','SOXX','LDRH','GLDM','FFNOX','AGG'];
+const CORR_SYMS  = ['VOLT','ELFY','DTCR','ARTY','SOXX','LDRH','FFNOX'];
 const CORR_TABLE = {
-  'VOLT|VWO':0.40,  'VOLT|QQQ':0.45,  'VOLT|DTCR':0.51, 'VOLT|VHT':0.15,  'VOLT|SOXX':0.44, 'VOLT|LDRH':0.12, 'VOLT|GLDM':0.08, 'VOLT|FFNOX':0.58, 'VOLT|AGG':0.10,
-  'VWO|QQQ':0.52,   'VWO|DTCR':0.40,  'VWO|VHT':0.28,   'VWO|SOXX':0.42,  'VWO|LDRH':0.15,  'VWO|GLDM':0.22,  'VWO|FFNOX':0.50,  'VWO|AGG':0.12,
-  'QQQ|DTCR':0.62,  'QQQ|VHT':0.22,   'QQQ|SOXX':0.75,  'QQQ|LDRH':0.10,  'QQQ|GLDM':0.06,  'QQQ|FFNOX':0.72, 'QQQ|AGG':0.08,
-  'DTCR|VHT':0.20,  'DTCR|SOXX':0.73, 'DTCR|LDRH':0.08, 'DTCR|GLDM':0.05, 'DTCR|FFNOX':0.64,'DTCR|AGG':0.07,
-  'VHT|SOXX':0.22,  'VHT|LDRH':0.14,  'VHT|GLDM':0.10,  'VHT|FFNOX':0.56, 'VHT|AGG':0.12,
-  'SOXX|LDRH':0.09, 'SOXX|GLDM':0.05, 'SOXX|FFNOX':0.62,'SOXX|AGG':0.08,
-  'LDRH|GLDM':0.15, 'LDRH|FFNOX':0.28,'LDRH|AGG':0.55,
-  'GLDM|FFNOX':0.15,'GLDM|AGG':0.18,
-  'FFNOX|AGG':0.32,
+  'VOLT|ELFY':0.93, 'VOLT|DTCR':0.51, 'VOLT|ARTY':0.47, 'VOLT|SOXX':0.44, 'VOLT|LDRH':0.12, 'VOLT|FFNOX':0.58,
+  'ELFY|DTCR':0.49, 'ELFY|ARTY':0.45, 'ELFY|SOXX':0.42, 'ELFY|LDRH':0.11, 'ELFY|FFNOX':0.56,
+  'DTCR|ARTY':0.78, 'DTCR|SOXX':0.73, 'DTCR|LDRH':0.08, 'DTCR|FFNOX':0.64,
+  'ARTY|SOXX':0.81, 'ARTY|LDRH':0.07, 'ARTY|FFNOX':0.68,
+  'SOXX|LDRH':0.09, 'SOXX|FFNOX':0.62,
+  'LDRH|FFNOX':0.28,
 };
 function corrVal(a, b) {
   if (a === b) return 1;
@@ -1271,26 +1265,26 @@ function corrColor(r) {
 }
 
 const HEALTH_RULES = [
-  { status:'warn', title:'Tech Cluster: QQQ + DTCR + SOXX (r = 0.62–0.75)',
-    desc:'Three holdings remain correlated within the tech/semi space. In a broad tech sell-off, all three fall together. This cluster represents ~25% of your combined portfolio — lower than before, but still worth monitoring.' },
+  { status:'fail', title:'VOLT + ELFY: Critical Overlap (r = 0.93)',
+    desc:'These two ETFs track nearly identical electrification themes and hold many of the same stocks. Owning both is not diversification — it doubles your exposure to one sub-sector. One should be replaced with something uncorrelated.' },
+  { status:'warn', title:'Tech Cluster: DTCR + ARTY + SOXX (r = 0.73–0.81)',
+    desc:'Three of your seven holdings are highly correlated to each other. In a tech sector sell-off, all three fall together. This cluster represents ~37% of your combined portfolio by value.' },
+  { status:'fail', title:'No Value Factor Exposure — 100% Growth Tilted',
+    desc:'Your entire portfolio bets on high-growth companies. Over very long cycles (15–50 yrs), Value stocks historically outperform Growth. ETFs like SCHD, VTV, or XLV would add balance.' },
   { status:'fail', title:'No International Developed Market Exposure',
-    desc:'Europe, Japan, UK, Canada, and Australia represent ~40% of global investable market cap. You own Emerging Markets (VWO) but zero Developed International. Over a 50-year horizon this is the single largest remaining geographic gap.' },
+    desc:'Europe, Japan, UK, Canada, and Australia represent ~40% of global investable market cap. Zero allocation over your 50-year horizon forfeits a massive slice of global compounding.' },
   { status:'fail', title:'No Mid-Cap or Small-Cap Exposure',
-    desc:'Small-caps have historically outperformed large-caps by ~1–2% per year over long periods (the "small-cap premium"). Every equity position targets US large-cap or international companies — VWO has some mid/small exposure but it is minimal.' },
-  { status:'warn', title:'No Value Factor Exposure — Growth-Tilted Portfolio',
-    desc:'QQQ, DTCR, SOXX, and VOLT all tilt heavily toward growth stocks. Over very long cycles, Value stocks periodically outperform. Adding SCHD or VTV would balance this factor risk and provide dividend compounding in your Roth IRA.' },
-  { status:'pass', title:'Healthcare Gap Filled — VHT Added to Roth IRA',
-    desc:'VHT (Vanguard Health Care ETF, beta 0.62) gives you defensive sector exposure with strong 50-year innovation tailwinds. It correlates at only 0.14–0.22 with your tech holdings — genuine diversification.' },
-  { status:'pass', title:'Emerging Markets Now Covered — VWO in Individual Brokerage',
-    desc:'VWO (Vanguard FTSE Emerging Markets) adds geographic diversification across India, Brazil, SE Asia, and China. Correctly placed in the taxable brokerage for a long-hold position.' },
-  { status:'pass', title:'Gold Hedge Added — GLDM in Roth IRA',
-    desc:'GLDM (beta 0.16) is your lowest-correlated holding. Gold acts as a genuine portfolio hedge and inflation protection — correlates near zero with all equity holdings and near zero with bonds.' },
-  { status:'pass', title:'Fixed Income Meaningfully Improved — LDRH + AGG (~15%)',
-    desc:'Two complementary bond positions: LDRH (short-duration high yield) and AGG (broad investment-grade). Together they represent ~15% of your portfolio — within the 10–20% target range for long-horizon investors.' },
+    desc:'Small-caps have historically outperformed large-caps by ~1–2% per year over long periods (the "small-cap premium"). Every position you hold targets US large-cap companies only.' },
+  { status:'warn', title:'Fixed Income Weight Too Small (~7% of Portfolio)',
+    desc:'LDRH is the only bond holding and represents just ~7% of your portfolio. Even for aggressive growth investors, 10–15% in bonds smooths volatility and enables opportunistic rebalancing during crashes.' },
+  { status:'warn', title:'High Estimated Portfolio Beta (~1.45× S&P 500)',
+    desc:'Thematic ETFs carry significantly higher volatility than the index. Your portfolio will likely swing ~45% harder than the S&P 500 in both directions. This is fine for a long horizon but expect large drawdowns.' },
   { status:'pass', title:'Broad Market Anchor Present — FFNOX in Roth IRA',
-    desc:'FFNOX (Fidelity Multi-Asset Index Fund) provides a diversified index core inside your tax-free account — ideal placement for a long-horizon compounder.' },
+    desc:'FFNOX (Fidelity Multi-Asset Index Fund) gives you a diversified index core inside your tax-free account — ideal placement for a long-horizon compounder.' },
+  { status:'pass', title:'Fixed Income Provides True Diversification (LDRH)',
+    desc:'LDRH correlates at only 0.07–0.28 with all your equity holdings. It genuinely reduces portfolio risk and is uncorrelated to the tech themes dominating your brokerage.' },
   { status:'pass', title:'Account Placement Strategy is Sound',
-    desc:'Thematic and international ETFs in the taxable brokerage; defensive, bond, and dividend positions in the Roth IRA. This is the optimal structure for dual-account tax efficiency over your 15–50 year horizon.' },
+    desc:'Riskier thematic ETFs in the taxable brokerage; conservative multi-asset and bonds in the tax-sheltered Roth IRA. This is the correct structure for your dual-account strategy.' },
 ];
 
 /* ══════════════════════════════════════════════════
